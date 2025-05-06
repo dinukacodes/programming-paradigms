@@ -103,24 +103,16 @@ fields: /* empty */
       | fields field
       ;
 
-field: FIELD field_name ':' field_type field_attributes ';'
+field: FIELD IDENTIFIER ':' field_type field_attributes ';'
      {
          add_field($2, $4.type, $5.required);
      }
      ;
 
-field_name: IDENTIFIER { $$ = $1; }
-          | EMAIL { $$ = "email"; }
-          | PASSWORD { $$ = "password"; }
+field_type: TEXT { $$.type = "text"; $$.required = 0; }
+          | EMAIL { $$.type = "email"; $$.required = 0; }
+          | PASSWORD { $$.type = "password"; $$.required = 0; }
           ;
-
-field_type: field_type_name { $$.type = $1; $$.required = 0; }
-          ;
-
-field_type_name: TEXT { $$ = "text"; }
-               | EMAIL { $$ = "email"; }
-               | PASSWORD { $$ = "password"; }
-               ;
 
 field_attributes: /* empty */ { $$.required = 0; }
                 | REQUIRED { $$.required = 1; }

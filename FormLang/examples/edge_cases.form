@@ -1,0 +1,30 @@
+form EdgeCases {
+  section EmptySection {
+  }
+
+  section SingleField {
+    field test: text required;
+  }
+
+  section MultipleFields {
+    field name: text required;
+    field email: email required;
+    field phone: text optional;
+  }
+
+  section MixedTypes {
+    field text: text required;
+    field email: email optional;
+    field password: password required;
+  }
+
+  section NoAttributes {
+    field test: text;
+  }
+
+  section AllOptional {
+    field test1: text optional;
+    field test2: email optional;
+    field test3: password optional;
+  }
+} 

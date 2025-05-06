@@ -17,6 +17,10 @@ void print_token(const char *token_name, const char *value) {
         }
     }
 }
+
+// Context tracking
+int after_field = 0;
+int after_colon = 0;
 %}
 
 %option nounput
@@ -30,10 +34,43 @@ void print_token(const char *token_name, const char *value) {
 
 "form"      { print_token("FORM", NULL); return FORM; }
 "section"   { print_token("SECTION", NULL); return SECTION; }
-"field"     { print_token("FIELD", NULL); return FIELD; }
-"text"      { print_token("TEXT", NULL); return TEXT; }
-"email"     { print_token("EMAIL_TYPE", NULL); return EMAIL; }
-"password"  { print_token("PASSWORD", NULL); return PASSWORD; }
+"field"     { after_field = 1; print_token("FIELD", NULL); return FIELD; }
+":"         { after_field = 0; after_colon = 1; print_token("SYMBOL", ":"); return ':'; }
+";"         { after_colon = 0; print_token("SYMBOL", ";"); return ';'; }
+
+"text"      { 
+    if (after_colon) {
+        print_token("TEXT", NULL); 
+        return TEXT;
+    } else {
+        yylval.str = strdup(yytext);
+        print_token("IDENTIFIER", yytext);
+        return IDENTIFIER;
+    }
+}
+
+"email"     { 
+    if (after_colon) {
+        print_token("EMAIL_TYPE", NULL); 
+        return EMAIL;
+    } else {
+        yylval.str = strdup(yytext);
+        print_token("IDENTIFIER", yytext);
+        return IDENTIFIER;
+    }
+}
+
+"password"  { 
+    if (after_colon) {
+        print_token("PASSWORD", NULL); 
+        return PASSWORD;
+    } else {
+        yylval.str = strdup(yytext);
+        print_token("IDENTIFIER", yytext);
+        return IDENTIFIER;
+    }
+}
+
 "required"  { print_token("REQUIRED", NULL); return REQUIRED; }
 "optional"  { print_token("OPTIONAL", NULL); return OPTIONAL; }
 
