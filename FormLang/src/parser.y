@@ -4,120 +4,135 @@
 #include <string.h>
 #include "formLang.h"
 
-void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
-extern FILE *yyin;
+void yyerror(const char *s);
 
-// Global variables
-Form current_form;
-Section current_section;
-Field current_field;
+// Global variables for current form and section
+Form *current_form = NULL;
+Section *current_section = NULL;
 
-void init_form(const char *name) {
-    current_form.name = strdup(name);
-    current_form.sections = NULL;
-    current_form.section_count = 0;
-    printf("Creating form: %s\n", name);
+// Helper functions
+Form* create_form(const char* name) {
+    Form* form = malloc(sizeof(Form));
+    form->name = strdup(name);
+    form->sections = NULL;
+    form->section_count = 0;
+    return form;
 }
 
-void add_section(const char *name) {
-    Section section;
-    section.name = strdup(name);
-    section.fields = NULL;
-    section.field_count = 0;
-    
-    current_form.sections = realloc(current_form.sections, 
-                                  (current_form.section_count + 1) * sizeof(Section));
-    current_form.sections[current_form.section_count++] = section;
-    printf("Adding section: %s\n", name);
+Section* create_section(const char* name) {
+    Section* section = malloc(sizeof(Section));
+    section->name = strdup(name);
+    section->fields = NULL;
+    section->field_count = 0;
+    return section;
 }
 
-void add_field(const char *name, const char *type, int required) {
-    if (current_form.section_count == 0) {
-        yyerror("Field declared outside of section");
-        return;
-    }
-
-    Section *current_section = &current_form.sections[current_form.section_count - 1];
-    
-    Field field;
-    field.name = strdup(name);
-    field.type = strdup(type);
-    field.required = required;
-    
-    current_section->fields = realloc(current_section->fields,
-                                    (current_section->field_count + 1) * sizeof(Field));
-    current_section->fields[current_section->field_count++] = field;
-    printf("Adding field: %s (type: %s, required: %s)\n", 
-           name, type, required ? "yes" : "no");
+void add_section_to_form(Form* form, Section* section) {
+    form->section_count++;
+    form->sections = realloc(form->sections, form->section_count * sizeof(Section*));
+    form->sections[form->section_count - 1] = section;
 }
 
-void print_form() {
-    printf("\nForm Structure:\n");
-    printf("Form: %s\n", current_form.name);
-    for (int i = 0; i < current_form.section_count; i++) {
-        printf("  Section: %s\n", current_form.sections[i].name);
-        for (int j = 0; j < current_form.sections[i].field_count; j++) {
-            printf("    Field: %s (%s) %s\n", 
-                   current_form.sections[i].fields[j].name,
-                   current_form.sections[i].fields[j].type,
-                   current_form.sections[i].fields[j].required ? "required" : "optional");
+void add_field_to_section(Section* section, const char* name, FieldType type, int required) {
+    section->field_count++;
+    section->fields = realloc(section->fields, section->field_count * sizeof(Field));
+    
+    Field* field = &section->fields[section->field_count - 1];
+    field->name = strdup(name);
+    field->type = type;
+    field->required = required;
+}
+
+void cleanup_form(Form* form) {
+    if (form) {
+        for (int i = 0; i < form->section_count; i++) {
+            Section* s = form->sections[i];
+            for (int j = 0; j < s->field_count; j++) {
+                Field* f = &s->fields[j];
+                free(f->name);
+            }
+            free(s->fields);
+            free(s->name);
+            free(s);
         }
+        free(form->sections);
+        free(form->name);
+        free(form);
     }
-    printf("\n");
 }
 %}
 
 %union {
-    int num;
     char *str;
-    struct {
-        char *type;
-        int required;
-    } field_info;
+    int required;
+    FieldType field_type;
 }
 
-%token FORM SECTION FIELD TEXT EMAIL PASSWORD REQUIRED OPTIONAL
-%token <str> IDENTIFIER STRING_LITERAL
-%token <num> NUMBER
+%token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER REQUIRED OPTIONAL
+%token IDENTIFIER NUMBER_LITERAL
 
-%type <field_info> field_type field_attributes
-%type <str> field_name field_type_name
-
-%start form
+%type <str> IDENTIFIER
+%type <field_type> field_type
+%type <required> field_attribute
 
 %%
 
-form: FORM IDENTIFIER '{' { init_form($2); } sections '}' { print_form(); }
+form: FORM IDENTIFIER {
+        current_form = create_form($2);
+        free($2);
+    } '{' section_list '}' {
+        generate_html(stdout);
+        cleanup_form(current_form);
+        current_form = NULL;
+    }
     ;
 
-sections: /* empty */
-        | sections section
-        ;
+section_list: section
+    | section_list section
+    ;
 
-section: SECTION IDENTIFIER '{' { add_section($2); } fields '}'
-       ;
+section: SECTION IDENTIFIER {
+        current_section = create_section($2);
+        free($2);
+    } '{' field_list '}' {
+        if (current_form && current_section) {
+            add_section_to_form(current_form, current_section);
+            current_section = NULL;
+        }
+    }
+    | error '}' {
+        fprintf(stderr, "Error: Invalid section declaration\n");
+        yyerrok;
+    }
+    ;
 
-fields: /* empty */
-      | fields field
-      ;
+field_list: field
+    | field_list field
+    ;
 
-field: FIELD IDENTIFIER ':' field_type field_attributes ';'
-     {
-         add_field($2, $4.type, $5.required);
-     }
-     ;
+field: FIELD IDENTIFIER ':' field_type field_attribute ';' {
+        if (current_section) {
+            add_field_to_section(current_section, $2, $4, $5);
+        }
+        free($2);
+    }
+    | error ';' {
+        fprintf(stderr, "Error: Invalid field declaration\n");
+        yyerrok;
+    }
+    ;
 
-field_type: TEXT { $$.type = "text"; $$.required = 0; }
-          | EMAIL { $$.type = "email"; $$.required = 0; }
-          | PASSWORD { $$.type = "password"; $$.required = 0; }
-          ;
+field_type: TEXT { $$ = FIELD_TEXT; }
+    | EMAIL { $$ = FIELD_EMAIL; }
+    | PASSWORD { $$ = FIELD_PASSWORD; }
+    | NUMBER { $$ = FIELD_NUMBER; }
+    ;
 
-field_attributes: /* empty */ { $$.required = 0; }
-                | REQUIRED { $$.required = 1; }
-                | OPTIONAL { $$.required = 0; }
-                ;
+field_attribute: REQUIRED { $$ = 1; }
+    | OPTIONAL { $$ = 0; }
+    ;
 
 %%
 
@@ -125,23 +140,7 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
 }
 
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        FILE *file = fopen(argv[1], "r");
-        if (!file) {
-            fprintf(stderr, "Error: Cannot open file %s\n", argv[1]);
-            return 1;
-        }
-        yyin = file;
-    }
-    
-    printf("Starting parser...\n");
-    int result = yyparse();
-    printf("Parser finished with result: %d\n", result);
-    
-    if (argc > 1) {
-        fclose(yyin);
-    }
-    
-    return result;
+int main() {
+    yyparse();
+    return 0;
 }

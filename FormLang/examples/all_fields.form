@@ -1,0 +1,21 @@
+form AllFields {
+    section TextFields {
+        field text1: text required;
+        field text2: text optional;
+    }
+    
+    section EmailFields {
+        field email1: email required;
+        field email2: email optional;
+    }
+    
+    section PasswordFields {
+        field pass1: password required;
+        field pass2: password optional;
+    }
+    
+    section NumberFields {
+        field num1: number required;
+        field num2: number optional;
+    }
+} 

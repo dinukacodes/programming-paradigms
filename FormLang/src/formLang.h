@@ -5,22 +5,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Type definitions
-typedef struct {
+// Field type definitions
+typedef enum {
+    FIELD_TEXT,
+    FIELD_EMAIL,
+    FIELD_PASSWORD,
+    FIELD_NUMBER
+} FieldType;
+
+// Structure definitions
+typedef struct Field {
     char *name;
-    char *type;
+    FieldType type;
     int required;
 } Field;
 
-typedef struct {
+typedef struct Section {
     char *name;
     Field *fields;
     int field_count;
 } Section;
 
-typedef struct {
+typedef struct Form {
     char *name;
-    Section *sections;
+    Section **sections;
     int section_count;
 } Form;
 
@@ -31,15 +39,20 @@ extern int yyparse(void);
 extern void yyerror(const char *s);
 
 // Global variables
-extern Form current_form;
-extern Section current_section;
-extern Field current_field;
+extern Form *current_form;
+extern Section *current_section;
 
 // Function declarations
-void generate_html();
-void init_form(const char *name);
-void add_section(const char *name);
-void add_field(const char *name, const char *type, int required);
-void print_form();
+void generate_html(FILE* output);
+void generate_html_header(FILE* output);
+void generate_html_footer(FILE* output);
+void generate_section_html(FILE* output, Section* section);
+
+// Helper functions
+Form* create_form(const char* name);
+Section* create_section(const char* name);
+void add_section_to_form(Form* form, Section* section);
+void add_field_to_section(Section* section, const char* name, FieldType type, int required);
+void cleanup_form(Form* form);
 
 #endif /* FORMLANG_H */

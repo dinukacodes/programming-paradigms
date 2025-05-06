@@ -1,5 +1,6 @@
 form Invalid {
   section Test {
-    field test: text;
+    field test: invalid required;
+    field test2: text
   }
 }

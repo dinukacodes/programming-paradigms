@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y"
+#line 1 "src/parser.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,82 +79,61 @@ extern int yylineno;
 void yyerror(const char *s);
 
 // Global variables for current form and section
-struct Form *current_form = NULL;
-struct Section *current_section = NULL;
+Form *current_form = NULL;
+Section *current_section = NULL;
 
 // Helper functions
-struct Form* create_form(const char* name) {
-    struct Form* form = malloc(sizeof(struct Form));
+Form* create_form(const char* name) {
+    Form* form = malloc(sizeof(Form));
     form->name = strdup(name);
     form->sections = NULL;
     form->section_count = 0;
-    printf("Created form: %s\n", name);
     return form;
 }
 
-struct Section* create_section(const char* name) {
-    struct Section* section = malloc(sizeof(struct Section));
+Section* create_section(const char* name) {
+    Section* section = malloc(sizeof(Section));
     section->name = strdup(name);
     section->fields = NULL;
     section->field_count = 0;
-    printf("Created section: %s\n", name);
     return section;
 }
 
-void add_section_to_form(struct Form* form, struct Section* section) {
+void add_section_to_form(Form* form, Section* section) {
     form->section_count++;
-    form->sections = realloc(form->sections, form->section_count * sizeof(struct Section*));
+    form->sections = realloc(form->sections, form->section_count * sizeof(Section*));
     form->sections[form->section_count - 1] = section;
-    printf("Added section '%s' to form '%s'\n", section->name, form->name);
 }
 
-void add_field_to_section(struct Section* section, const char* name, enum FieldType type, int required) {
-    // Check for duplicate field names
-    for (int i = 0; i < section->field_count; i++) {
-        if (strcmp(section->fields[i].name, name) == 0) {
-            fprintf(stderr, "Error at line %d: Duplicate field name '%s' in section '%s'\n", 
-                    yylineno, name, section->name);
-            return;
-        }
-    }
-
+void add_field_to_section(Section* section, const char* name, FieldType type, int required) {
     section->field_count++;
-    section->fields = realloc(section->fields, section->field_count * sizeof(struct Field));
+    section->fields = realloc(section->fields, section->field_count * sizeof(Field));
     
-    struct Field* field = &section->fields[section->field_count - 1];
+    Field* field = &section->fields[section->field_count - 1];
     field->name = strdup(name);
     field->type = type;
     field->required = required;
-    printf("Added field '%s' (type: %d, required: %d) to section '%s'\n", 
-           name, type, required, section->name);
 }
 
-void cleanup_form(struct Form* form) {
+void cleanup_form(Form* form) {
     if (form) {
-        printf("Cleaning up form '%s'\n", form->name);
         for (int i = 0; i < form->section_count; i++) {
-            struct Section* s = form->sections[i];
-            printf("Cleaning up section '%s'\n", s->name);
-            
+            Section* s = form->sections[i];
             for (int j = 0; j < s->field_count; j++) {
-                struct Field* f = &s->fields[j];
-                printf("Cleaning up field '%s'\n", f->name);
+                Field* f = &s->fields[j];
                 free(f->name);
             }
-            
             free(s->fields);
             free(s->name);
             free(s);
         }
-        
         free(form->sections);
         free(form->name);
         free(form);
     }
 }
 
-
-#line 158 "parser.tab.c"
+#line 137 "src/parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -185,17 +164,17 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_IDENTIFIER = 3,                 /* IDENTIFIER  */
-  YYSYMBOL_NUMBER_LITERAL = 4,             /* NUMBER_LITERAL  */
-  YYSYMBOL_FORM = 5,                       /* FORM  */
-  YYSYMBOL_SECTION = 6,                    /* SECTION  */
-  YYSYMBOL_FIELD = 7,                      /* FIELD  */
-  YYSYMBOL_TEXT = 8,                       /* TEXT  */
-  YYSYMBOL_EMAIL = 9,                      /* EMAIL  */
-  YYSYMBOL_PASSWORD = 10,                  /* PASSWORD  */
-  YYSYMBOL_NUMBER = 11,                    /* NUMBER  */
-  YYSYMBOL_REQUIRED = 12,                  /* REQUIRED  */
-  YYSYMBOL_OPTIONAL = 13,                  /* OPTIONAL  */
+  YYSYMBOL_FORM = 3,                       /* FORM  */
+  YYSYMBOL_SECTION = 4,                    /* SECTION  */
+  YYSYMBOL_FIELD = 5,                      /* FIELD  */
+  YYSYMBOL_TEXT = 6,                       /* TEXT  */
+  YYSYMBOL_EMAIL = 7,                      /* EMAIL  */
+  YYSYMBOL_PASSWORD = 8,                   /* PASSWORD  */
+  YYSYMBOL_NUMBER = 9,                     /* NUMBER  */
+  YYSYMBOL_REQUIRED = 10,                  /* REQUIRED  */
+  YYSYMBOL_OPTIONAL = 11,                  /* OPTIONAL  */
+  YYSYMBOL_IDENTIFIER = 12,                /* IDENTIFIER  */
+  YYSYMBOL_NUMBER_LITERAL = 13,            /* NUMBER_LITERAL  */
   YYSYMBOL_14_ = 14,                       /* '{'  */
   YYSYMBOL_15_ = 15,                       /* '}'  */
   YYSYMBOL_16_ = 16,                       /* ':'  */
@@ -537,7 +516,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   27
+#define YYLAST   35
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  18
@@ -546,7 +525,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  34
+#define YYNSTATES  35
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   268
@@ -596,8 +575,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   107,   107,   107,   118,   119,   123,   123,   132,   138,
-     140,   144,   150,   157,   158,   159,   160,   164,   165
+       0,    82,    82,    82,    92,    93,    96,    96,   105,   111,
+     112,   115,   121,   127,   128,   129,   130,   133,   134
 };
 #endif
 
@@ -613,11 +592,11 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "IDENTIFIER",
-  "NUMBER_LITERAL", "FORM", "SECTION", "FIELD", "TEXT", "EMAIL",
-  "PASSWORD", "NUMBER", "REQUIRED", "OPTIONAL", "'{'", "'}'", "':'", "';'",
-  "$accept", "form", "$@1", "section_list", "section", "$@2", "field_list",
-  "field", "field_type", "field_attribute", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "FORM", "SECTION",
+  "FIELD", "TEXT", "EMAIL", "PASSWORD", "NUMBER", "REQUIRED", "OPTIONAL",
+  "IDENTIFIER", "NUMBER_LITERAL", "'{'", "'}'", "':'", "';'", "$accept",
+  "form", "$@1", "section_list", "section", "$@2", "field_list", "field",
+  "field_type", "field_attribute", YY_NULLPTR
 };
 
 static const char *
@@ -627,7 +606,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-11)
+#define YYPACT_NINF (-2)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -641,10 +620,10 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,     3,    13,   -11,   -11,   -10,     2,     5,    15,    -1,
-     -11,   -11,   -11,   -11,   -11,     7,   -11,     0,     6,    16,
-     -11,   -11,   -11,     8,     1,   -11,   -11,   -11,   -11,     4,
-     -11,   -11,     9,   -11
+       9,     7,    13,    -2,    -2,     4,     3,     5,    10,    -1,
+      -2,    -2,    -2,    -2,    -2,    11,     1,    12,    14,     0,
+      -2,    -2,     8,    -2,    -2,     2,    -2,    -2,    -2,    -2,
+       6,    -2,    -2,    15,    -2
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -653,21 +632,21 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     2,     1,     0,     0,     0,     0,     0,
-       4,     8,     6,     3,     5,     0,     9,     0,     0,     0,
-       7,    10,    12,     0,     0,    13,    14,    15,    16,     0,
-      17,    18,     0,    11
+       4,     8,     6,     3,     5,     0,     0,     0,     0,     0,
+       9,    12,     0,     7,    10,     0,    13,    14,    15,    16,
+       0,    17,    18,     0,    11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,   -11,   -11,    18,   -11,   -11,   -11,   -11,   -11
+      -2,    -2,    -2,    -2,    18,    -2,    -2,    16,    -2,    -2
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     5,     9,    10,    15,    17,    21,    29,    32
+       0,     2,     5,     9,    10,    15,    19,    20,    30,    33
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -675,26 +654,28 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       7,    18,     1,     7,     6,     8,     3,    19,     8,    25,
-      26,    27,    28,     4,    13,    20,    30,    31,    12,    23,
-      11,    16,     0,    22,    24,     0,    33,    14
+       7,    17,    17,     8,     7,    18,    18,     8,    26,    27,
+      28,    29,     1,     4,    13,    23,    31,    32,     6,     3,
+      11,     0,    12,     0,    25,    16,    22,    14,     0,    21,
+       0,     0,    34,     0,     0,    24
 };
 
 static const yytype_int8 yycheck[] =
 {
-       1,     1,     5,     1,    14,     6,     3,     7,     6,     8,
-       9,    10,    11,     0,    15,    15,    12,    13,     3,     3,
-      15,    14,    -1,    17,    16,    -1,    17,     9
+       1,     1,     1,     4,     1,     5,     5,     4,     6,     7,
+       8,     9,     3,     0,    15,    15,    10,    11,    14,    12,
+      15,    -1,    12,    -1,    16,    14,    12,     9,    -1,    17,
+      -1,    -1,    17,    -1,    -1,    19
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,    19,     3,     0,    20,    14,     1,     6,    21,
-      22,    15,     3,    15,    22,    23,    14,    24,     1,     7,
-      15,    25,    17,     3,    16,     8,     9,    10,    11,    26,
-      12,    13,    27,    17
+       0,     3,    19,    12,     0,    20,    14,     1,     4,    21,
+      22,    15,    12,    15,    22,    23,    14,     1,     5,    24,
+      25,    17,    12,    15,    25,    16,     6,     7,     8,     9,
+      26,    10,    11,    27,    17
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -707,7 +688,7 @@ static const yytype_int8 yyr1[] =
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     6,     1,     2,     0,     6,     2,     0,
+       0,     2,     0,     6,     1,     2,     0,     6,     2,     1,
        2,     6,     2,     1,     1,     1,     1,     1,     1
 };
 
@@ -1172,111 +1153,111 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 107 "parser.y"
-                    {
+#line 82 "src/parser.y"
+                      {
         current_form = create_form((yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1181 "parser.tab.c"
+#line 1162 "src/parser.tab.c"
     break;
 
   case 3: /* form: FORM IDENTIFIER $@1 '{' section_list '}'  */
-#line 110 "parser.y"
+#line 85 "src/parser.y"
                            {
-        printf("Form '%s' defined with %d sections\n", current_form->name, current_form->section_count);
+        generate_html(stdout);
         cleanup_form(current_form);
         current_form = NULL;
     }
-#line 1191 "parser.tab.c"
+#line 1172 "src/parser.tab.c"
     break;
 
   case 6: /* $@2: %empty  */
-#line 123 "parser.y"
-                       {
+#line 96 "src/parser.y"
+                            {
         current_section = create_section((yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1200 "parser.tab.c"
+#line 1181 "src/parser.tab.c"
     break;
 
   case 7: /* section: SECTION IDENTIFIER $@2 '{' field_list '}'  */
-#line 126 "parser.y"
+#line 99 "src/parser.y"
                          {
         if (current_form && current_section) {
             add_section_to_form(current_form, current_section);
             current_section = NULL;
         }
     }
-#line 1211 "parser.tab.c"
+#line 1192 "src/parser.tab.c"
     break;
 
   case 8: /* section: error '}'  */
-#line 132 "parser.y"
+#line 105 "src/parser.y"
                 {
         fprintf(stderr, "Error: Invalid section declaration\n");
         yyerrok;
     }
-#line 1220 "parser.tab.c"
+#line 1201 "src/parser.tab.c"
     break;
 
   case 11: /* field: FIELD IDENTIFIER ':' field_type field_attribute ';'  */
-#line 144 "parser.y"
-                                                        {
+#line 115 "src/parser.y"
+                                                           {
         if (current_section) {
             add_field_to_section(current_section, (yyvsp[-4].str), (yyvsp[-2].field_type), (yyvsp[-1].required));
         }
         free((yyvsp[-4].str));
     }
-#line 1231 "parser.tab.c"
+#line 1212 "src/parser.tab.c"
     break;
 
   case 12: /* field: error ';'  */
-#line 150 "parser.y"
+#line 121 "src/parser.y"
                 {
         fprintf(stderr, "Error: Invalid field declaration\n");
         yyerrok;
     }
-#line 1240 "parser.tab.c"
+#line 1221 "src/parser.tab.c"
     break;
 
   case 13: /* field_type: TEXT  */
-#line 157 "parser.y"
-         { (yyval.field_type) = FIELD_TEXT; printf("Field type: TEXT\n"); }
-#line 1246 "parser.tab.c"
+#line 127 "src/parser.y"
+                 { (yyval.field_type) = FIELD_TEXT; }
+#line 1227 "src/parser.tab.c"
     break;
 
   case 14: /* field_type: EMAIL  */
-#line 158 "parser.y"
-            { (yyval.field_type) = FIELD_EMAIL; printf("Field type: EMAIL\n"); }
-#line 1252 "parser.tab.c"
+#line 128 "src/parser.y"
+            { (yyval.field_type) = FIELD_EMAIL; }
+#line 1233 "src/parser.tab.c"
     break;
 
   case 15: /* field_type: PASSWORD  */
-#line 159 "parser.y"
-               { (yyval.field_type) = FIELD_PASSWORD; printf("Field type: PASSWORD\n"); }
-#line 1258 "parser.tab.c"
+#line 129 "src/parser.y"
+               { (yyval.field_type) = FIELD_PASSWORD; }
+#line 1239 "src/parser.tab.c"
     break;
 
   case 16: /* field_type: NUMBER  */
-#line 160 "parser.y"
-             { (yyval.field_type) = FIELD_NUMBER; printf("Field type: NUMBER\n"); }
-#line 1264 "parser.tab.c"
+#line 130 "src/parser.y"
+             { (yyval.field_type) = FIELD_NUMBER; }
+#line 1245 "src/parser.tab.c"
     break;
 
   case 17: /* field_attribute: REQUIRED  */
-#line 164 "parser.y"
-             { (yyval.required) = 1; printf("Field attribute: REQUIRED\n"); }
-#line 1270 "parser.tab.c"
+#line 133 "src/parser.y"
+                          { (yyval.required) = 1; }
+#line 1251 "src/parser.tab.c"
     break;
 
   case 18: /* field_attribute: OPTIONAL  */
-#line 165 "parser.y"
-               { (yyval.required) = 0; printf("Field attribute: OPTIONAL\n"); }
-#line 1276 "parser.tab.c"
+#line 134 "src/parser.y"
+               { (yyval.required) = 0; }
+#line 1257 "src/parser.tab.c"
     break;
 
 
-#line 1280 "parser.tab.c"
+#line 1261 "src/parser.tab.c"
 
       default: break;
     }
@@ -1469,7 +1450,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 168 "parser.y"
+#line 137 "src/parser.y"
 
 
 void yyerror(const char *s) {

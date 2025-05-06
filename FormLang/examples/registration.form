@@ -2,7 +2,7 @@ form Registration {
     section Personal {
         field name: text required;
         field email: email required;
-        field phone: text optional;
+        field phone: number optional;
     }
     
     section Account {
