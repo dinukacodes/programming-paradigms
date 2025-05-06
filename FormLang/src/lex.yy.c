@@ -519,9 +519,17 @@ extern YYSTYPE yylval;
 // Context tracking
 int after_field = 0;
 int after_colon = 0;
-#line 523 "src/lex.yy.c"
+int after_section = 0;
+int after_form = 0;
+int after_type = 0;
+
+// Error handling
+void syntax_error(const char* msg) {
+    fprintf(stderr, "Syntax error at line %d: %s\n", yylineno, msg);
+}
+#line 531 "src/lex.yy.c"
 #define YY_NO_INPUT 1
-#line 525 "src/lex.yy.c"
+#line 533 "src/lex.yy.c"
 
 #define INITIAL 0
 
@@ -736,10 +744,10 @@ YY_DECL
 		}
 
 	{
-#line 20 "src/lexer.l"
+#line 28 "src/lexer.l"
 
 
-#line 743 "src/lex.yy.c"
+#line 751 "src/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -809,49 +817,95 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 22 "src/lexer.l"
+#line 30 "src/lexer.l"
 ; /* Skip whitespace and newlines */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "src/lexer.l"
-{ return FORM; }
+#line 32 "src/lexer.l"
+{ 
+    if (after_form) {
+        syntax_error("Nested form declarations are not allowed");
+        return -1;
+    }
+    after_form = 1;
+    after_section = 0;
+    return FORM;
+}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "src/lexer.l"
-{ return SECTION; }
+#line 41 "src/lexer.l"
+{ 
+    if (!after_form) {
+        syntax_error("Section must be inside a form");
+        return -1;
+    }
+    after_section = 1;
+    return SECTION;
+}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "src/lexer.l"
-{ after_field = 1; return FIELD; }
+#line 49 "src/lexer.l"
+{ 
+    if (!after_section) {
+        syntax_error("Field must be inside a section");
+        return -1;
+    }
+    after_field = 1; 
+    return FIELD; 
+}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "src/lexer.l"
-{ after_field = 0; after_colon = 1; return ':'; }
+#line 57 "src/lexer.l"
+{ 
+    if (!after_field) {
+        syntax_error("Colon must follow field name");
+        return -1;
+    }
+    after_field = 0; 
+    after_colon = 1; 
+    return ':'; 
+}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "src/lexer.l"
-{ after_colon = 0; return ';'; }
+#line 66 "src/lexer.l"
+{ 
+    if (!after_colon && !after_type) {
+        syntax_error("Semicolon must follow field type and attributes");
+        return -1;
+    }
+    after_colon = 0;
+    after_type = 0;
+    return ';'; 
+}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 29 "src/lexer.l"
+#line 75 "src/lexer.l"
 { return '{'; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 30 "src/lexer.l"
-{ return '}'; }
+#line 76 "src/lexer.l"
+{ 
+    if (after_section) {
+        after_section = 0;
+    } else if (after_form) {
+        after_form = 0;
+    }
+    return '}';
+}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "src/lexer.l"
+#line 85 "src/lexer.l"
 { 
     if (after_colon) {
+        after_type = 1;
         return TEXT;
     } else {
         yylval.str = strdup(yytext);
@@ -861,9 +915,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 41 "src/lexer.l"
+#line 95 "src/lexer.l"
 { 
     if (after_colon) {
+        after_type = 1;
         return EMAIL;
     } else {
         yylval.str = strdup(yytext);
@@ -873,9 +928,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 50 "src/lexer.l"
+#line 105 "src/lexer.l"
 { 
     if (after_colon) {
+        after_type = 1;
         return PASSWORD;
     } else {
         yylval.str = strdup(yytext);
@@ -885,9 +941,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 59 "src/lexer.l"
+#line 115 "src/lexer.l"
 {
     if (after_colon) {
+        after_type = 1;
         return NUMBER;
     } else {
         yylval.str = strdup(yytext);
@@ -897,25 +954,41 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 68 "src/lexer.l"
-{ return REQUIRED; }
+#line 125 "src/lexer.l"
+{ 
+    if (!after_colon && !after_type) {
+        syntax_error("Field attributes must follow field type");
+        return -1;
+    }
+    return REQUIRED; 
+}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 69 "src/lexer.l"
-{ return OPTIONAL; }
+#line 132 "src/lexer.l"
+{ 
+    if (!after_colon && !after_type) {
+        syntax_error("Field attributes must follow field type");
+        return -1;
+    }
+    return OPTIONAL; 
+}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 71 "src/lexer.l"
+#line 140 "src/lexer.l"
 { 
+    if (after_colon) {
+        syntax_error("Invalid field type");
+        return -1;
+    }
     yylval.str = strdup(yytext);
     return IDENTIFIER;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 76 "src/lexer.l"
+#line 149 "src/lexer.l"
 {
     yylval.str = strdup(yytext);
     return NUMBER_LITERAL;
@@ -923,18 +996,18 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 81 "src/lexer.l"
+#line 154 "src/lexer.l"
 { 
-    fprintf(stderr, "Error: Unexpected character '%c' at line %d\n", yytext[0], yylineno);
-    return yytext[0];
+    syntax_error("Unexpected character");
+    return -1;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 86 "src/lexer.l"
+#line 159 "src/lexer.l"
 ECHO;
 	YY_BREAK
-#line 938 "src/lex.yy.c"
+#line 1011 "src/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1910,6 +1983,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 86 "src/lexer.l"
+#line 159 "src/lexer.l"
 
 

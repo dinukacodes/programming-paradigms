@@ -1,0 +1,14 @@
+form LongFieldNames {
+    section UserProfile {
+        field firstName: text required;
+        field middleName: text optional;
+        field lastName: text required;
+        field preferredName: text optional;
+        field dateOfBirth: text required;
+        field primaryEmailAddress: email required;
+        field secondaryEmailAddress: email optional;
+        field mobilePhoneNumber: number required;
+        field homePhoneNumber: number optional;
+        field workPhoneNumber: number optional;
+    }
+} 

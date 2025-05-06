@@ -6,7 +6,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-SRCS = $(SRC_DIR)/html_generator.c $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.c
+SRCS = $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.c
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
 TARGET = $(BIN_DIR)/formLang

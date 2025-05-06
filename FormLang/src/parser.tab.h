@@ -73,13 +73,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 67 "src/parser.y"
+#line 151 "src/parser.y"
 
-    char *str;
-    int required;
+    char* str;
+    int num;
+    Form* form;
+    Section* section;
     FieldType field_type;
 
-#line 83 "src/parser.tab.h"
+#line 85 "src/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -74,71 +74,88 @@
 #include <string.h>
 #include "formLang.h"
 
-void yyerror(const char *s);
 extern int yylex();
 extern int yylineno;
-extern FILE *yyin;
+void yyerror(const char *s);
 
-// Global variables
-Form current_form;
-Section current_section;
-Field current_field;
+// Global variables for current form and section
+Form *current_form = NULL;
+Section *current_section = NULL;
 
-void init_form(const char *name) {
-    current_form.name = strdup(name);
-    current_form.sections = NULL;
-    current_form.section_count = 0;
-    printf("Creating form: %s\n", name);
+// Helper functions
+Form* create_form(const char* name) {
+    Form* form = malloc(sizeof(Form));
+    form->name = strdup(name);
+    form->sections = NULL;
+    form->section_count = 0;
+    return form;
 }
 
-void add_section(const char *name) {
-    Section section;
-    section.name = strdup(name);
-    section.fields = NULL;
-    section.field_count = 0;
-    
-    current_form.sections = realloc(current_form.sections, 
-                                  (current_form.section_count + 1) * sizeof(Section));
-    current_form.sections[current_form.section_count++] = section;
-    printf("Adding section: %s\n", name);
+Section* create_section(const char* name) {
+    Section* section = malloc(sizeof(Section));
+    section->name = strdup(name);
+    section->fields = NULL;
+    section->field_count = 0;
+    return section;
 }
 
-void add_field(const char *name, const char *type, int required) {
-    if (current_form.section_count == 0) {
-        yyerror("Field declared outside of section");
-        return;
-    }
-
-    Section *current_section = &current_form.sections[current_form.section_count - 1];
-    
-    Field field;
-    field.name = strdup(name);
-    field.type = strdup(type);
-    field.required = required;
-    
-    current_section->fields = realloc(current_section->fields,
-                                    (current_section->field_count + 1) * sizeof(Field));
-    current_section->fields[current_section->field_count++] = field;
-    printf("Adding field: %s (type: %s, required: %s)\n", 
-           name, type, required ? "yes" : "no");
+void add_section_to_form(Form* form, Section* section) {
+    form->section_count++;
+    form->sections = realloc(form->sections, form->section_count * sizeof(Section*));
+    form->sections[form->section_count - 1] = section;
 }
 
-void print_form() {
-    printf("\nForm Structure:\n");
-    printf("Form: %s\n", current_form.name);
-    for (int i = 0; i < current_form.section_count; i++) {
-        printf("  Section: %s\n", current_form.sections[i].name);
-        for (int j = 0; j < current_form.sections[i].field_count; j++) {
-            printf("    Field: %s (%s) %s\n", 
-                   current_form.sections[i].fields[j].name,
-                   current_form.sections[i].fields[j].type,
-                   current_form.sections[i].fields[j].required ? "required" : "optional");
+void init_field_attributes(FieldAttributes* attrs) {
+    attrs->min_length = -1;
+    attrs->max_length = -1;
+    attrs->min_value = -1;
+    attrs->max_value = -1;
+    attrs->rows = -1;
+    attrs->cols = -1;
+    attrs->pattern = NULL;
+    attrs->default_value = NULL;
+    attrs->options = NULL;
+    attrs->option_count = 0;
+}
+
+void add_field_to_section(Section* section, const char* name, FieldType type, int required, FieldAttributes attrs) {
+    section->field_count++;
+    section->fields = realloc(section->fields, section->field_count * sizeof(Field));
+    
+    Field* field = &section->fields[section->field_count - 1];
+    field->name = strdup(name);
+    field->type = type;
+    field->required = required;
+    field->attributes = attrs;
+}
+
+void cleanup_form(Form* form) {
+    if (form) {
+        for (int i = 0; i < form->section_count; i++) {
+            Section* s = form->sections[i];
+            for (int j = 0; j < s->field_count; j++) {
+                Field* f = &s->fields[j];
+                free(f->name);
+                if (f->attributes.pattern) free(f->attributes.pattern);
+                if (f->attributes.default_value) free(f->attributes.default_value);
+                if (f->attributes.options) {
+                    for (int k = 0; k < f->attributes.option_count; k++) {
+                        free(f->attributes.options[k]);
+                    }
+                    free(f->attributes.options);
+                }
+            }
+            free(s->fields);
+            free(s->name);
+            free(s);
         }
+        free(form->sections);
+        free(form->name);
+        free(form);
     }
-    printf("\n");
 }
 
-#line 142 "y.tab.c"
+#line 159 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -167,7 +184,7 @@ void print_form() {
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -188,11 +205,27 @@ extern int yydebug;
     TEXT = 261,                    /* TEXT  */
     EMAIL = 262,                   /* EMAIL  */
     PASSWORD = 263,                /* PASSWORD  */
-    REQUIRED = 264,                /* REQUIRED  */
-    OPTIONAL = 265,                /* OPTIONAL  */
-    IDENTIFIER = 266,              /* IDENTIFIER  */
-    STRING_LITERAL = 267,          /* STRING_LITERAL  */
-    NUMBER = 268                   /* NUMBER  */
+    NUMBER = 264,                  /* NUMBER  */
+    TEXTAREA = 265,                /* TEXTAREA  */
+    DATE = 266,                    /* DATE  */
+    CHECKBOX = 267,                /* CHECKBOX  */
+    DROPDOWN = 268,                /* DROPDOWN  */
+    RADIO = 269,                   /* RADIO  */
+    FILE_TYPE = 270,               /* FILE_TYPE  */
+    REQUIRED = 271,                /* REQUIRED  */
+    OPTIONAL = 272,                /* OPTIONAL  */
+    MIN_LENGTH = 273,              /* MIN_LENGTH  */
+    MAX_LENGTH = 274,              /* MAX_LENGTH  */
+    MIN = 275,                     /* MIN  */
+    MAX = 276,                     /* MAX  */
+    ROWS = 277,                    /* ROWS  */
+    COLS = 278,                    /* COLS  */
+    PATTERN = 279,                 /* PATTERN  */
+    DEFAULT = 280,                 /* DEFAULT  */
+    OPTIONS = 281,                 /* OPTIONS  */
+    IDENTIFIER = 282,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 283,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 284           /* STRING_LITERAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -207,26 +240,44 @@ extern int yydebug;
 #define TEXT 261
 #define EMAIL 262
 #define PASSWORD 263
-#define REQUIRED 264
-#define OPTIONAL 265
-#define IDENTIFIER 266
-#define STRING_LITERAL 267
-#define NUMBER 268
+#define NUMBER 264
+#define TEXTAREA 265
+#define DATE 266
+#define CHECKBOX 267
+#define DROPDOWN 268
+#define RADIO 269
+#define FILE_TYPE 270
+#define REQUIRED 271
+#define OPTIONAL 272
+#define MIN_LENGTH 273
+#define MAX_LENGTH 274
+#define MIN 275
+#define MAX 276
+#define ROWS 277
+#define COLS 278
+#define PATTERN 279
+#define DEFAULT 280
+#define OPTIONS 281
+#define IDENTIFIER 282
+#define NUMBER_LITERAL 283
+#define STRING_LITERAL 284
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 72 "parser.y"
+#line 89 "parser.y"
 
-    int num;
     char *str;
+    int required;
+    FieldType field_type;
+    FieldAttributes field_attrs;
     struct {
-        char *type;
-        int required;
-    } field_info;
+        char** options;
+        int count;
+    } option_list;
 
-#line 230 "y.tab.c"
+#line 281 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -255,25 +306,49 @@ enum yysymbol_kind_t
   YYSYMBOL_TEXT = 6,                       /* TEXT  */
   YYSYMBOL_EMAIL = 7,                      /* EMAIL  */
   YYSYMBOL_PASSWORD = 8,                   /* PASSWORD  */
-  YYSYMBOL_REQUIRED = 9,                   /* REQUIRED  */
-  YYSYMBOL_OPTIONAL = 10,                  /* OPTIONAL  */
-  YYSYMBOL_IDENTIFIER = 11,                /* IDENTIFIER  */
-  YYSYMBOL_STRING_LITERAL = 12,            /* STRING_LITERAL  */
-  YYSYMBOL_NUMBER = 13,                    /* NUMBER  */
-  YYSYMBOL_14_ = 14,                       /* '{'  */
-  YYSYMBOL_15_ = 15,                       /* '}'  */
-  YYSYMBOL_16_ = 16,                       /* ':'  */
-  YYSYMBOL_17_ = 17,                       /* ';'  */
-  YYSYMBOL_YYACCEPT = 18,                  /* $accept  */
-  YYSYMBOL_form = 19,                      /* form  */
-  YYSYMBOL_20_1 = 20,                      /* $@1  */
-  YYSYMBOL_sections = 21,                  /* sections  */
-  YYSYMBOL_section = 22,                   /* section  */
-  YYSYMBOL_23_2 = 23,                      /* $@2  */
-  YYSYMBOL_fields = 24,                    /* fields  */
-  YYSYMBOL_field = 25,                     /* field  */
-  YYSYMBOL_field_type = 26,                /* field_type  */
-  YYSYMBOL_field_attributes = 27           /* field_attributes  */
+  YYSYMBOL_NUMBER = 9,                     /* NUMBER  */
+  YYSYMBOL_TEXTAREA = 10,                  /* TEXTAREA  */
+  YYSYMBOL_DATE = 11,                      /* DATE  */
+  YYSYMBOL_CHECKBOX = 12,                  /* CHECKBOX  */
+  YYSYMBOL_DROPDOWN = 13,                  /* DROPDOWN  */
+  YYSYMBOL_RADIO = 14,                     /* RADIO  */
+  YYSYMBOL_FILE_TYPE = 15,                 /* FILE_TYPE  */
+  YYSYMBOL_REQUIRED = 16,                  /* REQUIRED  */
+  YYSYMBOL_OPTIONAL = 17,                  /* OPTIONAL  */
+  YYSYMBOL_MIN_LENGTH = 18,                /* MIN_LENGTH  */
+  YYSYMBOL_MAX_LENGTH = 19,                /* MAX_LENGTH  */
+  YYSYMBOL_MIN = 20,                       /* MIN  */
+  YYSYMBOL_MAX = 21,                       /* MAX  */
+  YYSYMBOL_ROWS = 22,                      /* ROWS  */
+  YYSYMBOL_COLS = 23,                      /* COLS  */
+  YYSYMBOL_PATTERN = 24,                   /* PATTERN  */
+  YYSYMBOL_DEFAULT = 25,                   /* DEFAULT  */
+  YYSYMBOL_OPTIONS = 26,                   /* OPTIONS  */
+  YYSYMBOL_IDENTIFIER = 27,                /* IDENTIFIER  */
+  YYSYMBOL_NUMBER_LITERAL = 28,            /* NUMBER_LITERAL  */
+  YYSYMBOL_STRING_LITERAL = 29,            /* STRING_LITERAL  */
+  YYSYMBOL_30_ = 30,                       /* '{'  */
+  YYSYMBOL_31_ = 31,                       /* '}'  */
+  YYSYMBOL_32_ = 32,                       /* ':'  */
+  YYSYMBOL_33_ = 33,                       /* ';'  */
+  YYSYMBOL_34_ = 34,                       /* '['  */
+  YYSYMBOL_35_ = 35,                       /* ']'  */
+  YYSYMBOL_36_ = 36,                       /* ','  */
+  YYSYMBOL_37_ = 37,                       /* '='  */
+  YYSYMBOL_YYACCEPT = 38,                  /* $accept  */
+  YYSYMBOL_form = 39,                      /* form  */
+  YYSYMBOL_40_1 = 40,                      /* $@1  */
+  YYSYMBOL_section_list = 41,              /* section_list  */
+  YYSYMBOL_section = 42,                   /* section  */
+  YYSYMBOL_43_2 = 43,                      /* $@2  */
+  YYSYMBOL_field_list = 44,                /* field_list  */
+  YYSYMBOL_field = 45,                     /* field  */
+  YYSYMBOL_field_type = 46,                /* field_type  */
+  YYSYMBOL_field_attribute = 47,           /* field_attribute  */
+  YYSYMBOL_field_attributes = 48,          /* field_attributes  */
+  YYSYMBOL_attribute_list = 49,            /* attribute_list  */
+  YYSYMBOL_attribute = 50,                 /* attribute  */
+  YYSYMBOL_option_list = 51                /* option_list  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -471,7 +546,7 @@ typedef int yy_state_fast_t;
 
 #define YY_ASSERT(E) ((void) (0 && (E)))
 
-#if !defined yyoverflow
+#if 1
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
@@ -536,7 +611,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 # endif
-#endif /* !defined yyoverflow */
+#endif /* 1 */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
@@ -601,19 +676,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   21
+#define YYLAST   71
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  18
+#define YYNTOKENS  38
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  10
+#define YYNNTS  14
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  16
+#define YYNRULES  39
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  28
+#define YYNSTATES  80
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   268
+#define YYMAXUTOK   284
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -631,15 +706,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    16,    17,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    36,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    32,    33,
+       2,    37,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,    34,     2,    35,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    14,     2,    15,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    30,     2,    31,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -653,22 +728,26 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    92,    92,    92,    95,    96,    99,    99,   102,   103,
-     106,   112,   113,   114,   117,   118,   119
+       0,   114,   114,   114,   124,   125,   128,   128,   137,   143,
+     144,   147,   153,   159,   160,   161,   162,   163,   164,   165,
+     166,   167,   168,   171,   172,   175,   180,   183,   184,   199,
+     204,   209,   214,   219,   224,   229,   233,   237,   244,   249
 };
 #endif
 
 /** Accessing symbol of state STATE.  */
 #define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
 
-#if YYDEBUG || 0
+#if 1
 /* The user-facing name of the symbol whose (internal) number is
    YYSYMBOL.  No bounds checking.  */
 static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
@@ -678,10 +757,14 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "FORM", "SECTION",
-  "FIELD", "TEXT", "EMAIL", "PASSWORD", "REQUIRED", "OPTIONAL",
-  "IDENTIFIER", "STRING_LITERAL", "NUMBER", "'{'", "'}'", "':'", "';'",
-  "$accept", "form", "$@1", "sections", "section", "$@2", "fields",
-  "field", "field_type", "field_attributes", YY_NULLPTR
+  "FIELD", "TEXT", "EMAIL", "PASSWORD", "NUMBER", "TEXTAREA", "DATE",
+  "CHECKBOX", "DROPDOWN", "RADIO", "FILE_TYPE", "REQUIRED", "OPTIONAL",
+  "MIN_LENGTH", "MAX_LENGTH", "MIN", "MAX", "ROWS", "COLS", "PATTERN",
+  "DEFAULT", "OPTIONS", "IDENTIFIER", "NUMBER_LITERAL", "STRING_LITERAL",
+  "'{'", "'}'", "':'", "';'", "'['", "']'", "','", "'='", "$accept",
+  "form", "$@1", "section_list", "section", "$@2", "field_list", "field",
+  "field_type", "field_attribute", "field_attributes", "attribute_list",
+  "attribute", "option_list", YY_NULLPTR
 };
 
 static const char *
@@ -691,7 +774,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-11)
+#define YYPACT_NINF (-26)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -705,9 +788,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       0,   -10,     7,     1,   -11,   -11,   -11,    -4,     2,   -11,
-     -11,     3,   -11,   -11,    -3,     5,   -11,   -11,    -6,    -2,
-     -11,   -11,   -11,    -1,   -11,   -11,     4,   -11
+      16,   -25,     4,   -26,   -26,   -24,    31,     9,     7,    -1,
+     -26,   -26,   -26,   -26,   -26,    11,    28,    10,    15,     0,
+     -26,   -26,    12,   -26,   -26,     1,   -26,   -26,   -26,   -26,
+     -26,   -26,   -26,   -26,   -26,   -26,    20,   -26,   -26,    13,
+       2,    17,     8,    14,    18,    19,    21,    22,    23,    24,
+      25,   -18,   -26,   -26,    26,    29,    35,    36,    37,    38,
+      39,    40,    33,   -26,     2,   -26,   -26,   -26,   -26,   -26,
+     -26,   -26,   -26,    41,   -26,   -26,     3,   -26,    42,   -26
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -715,21 +803,28 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     1,     2,     4,     0,     0,     3,
-       5,     0,     6,     8,     0,     0,     7,     9,     0,     0,
-      11,    12,    13,    14,    15,    16,     0,    10
+       0,     0,     0,     2,     1,     0,     0,     0,     0,     0,
+       4,     8,     6,     3,     5,     0,     0,     0,     0,     0,
+       9,    12,     0,     7,    10,     0,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    22,     0,    23,    24,    25,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    27,    11,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    26,     0,    29,    30,    31,    32,    33,
+      34,    35,    36,     0,    28,    38,     0,    37,     0,    39
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11
+     -26,   -26,   -26,   -26,    43,   -26,   -26,    27,   -26,   -26,
+     -26,   -26,   -16,   -26
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     6,     7,    10,    13,    14,    17,    23,    26
+       0,     2,     5,     9,    10,    15,    19,    20,    36,    39,
+      41,    51,    52,    76
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -737,39 +832,58 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       8,     3,    15,     1,    20,    21,    22,     4,    24,    25,
-      19,     9,    16,    11,     0,     5,    18,    12,     0,     0,
-       0,    27
+       7,    17,     3,     8,     4,    18,     6,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    63,    64,     1,
+      42,    43,    44,    45,    46,    47,    48,    49,    50,    17,
+      13,    23,     7,    18,    12,     8,    37,    38,    77,    78,
+      11,    16,    22,    21,    25,    54,    24,    40,    74,     0,
+      53,    55,    14,     0,    65,    56,    57,    66,    58,    59,
+      60,    61,    62,    67,    68,    69,    70,    73,    71,    72,
+      75,    79
 };
 
 static const yytype_int8 yycheck[] =
 {
-       4,    11,     5,     3,     6,     7,     8,     0,     9,    10,
-      16,    15,    15,    11,    -1,    14,    11,    14,    -1,    -1,
-      -1,    17
+       1,     1,    27,     4,     0,     5,    30,     6,     7,     8,
+       9,    10,    11,    12,    13,    14,    15,    35,    36,     3,
+      18,    19,    20,    21,    22,    23,    24,    25,    26,     1,
+      31,    31,     1,     5,    27,     4,    16,    17,    35,    36,
+      31,    30,    27,    33,    32,    37,    19,    34,    64,    -1,
+      33,    37,     9,    -1,    28,    37,    37,    28,    37,    37,
+      37,    37,    37,    28,    28,    28,    28,    34,    29,    29,
+      29,    29
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    19,    11,     0,    14,    20,    21,     4,    15,
-      22,    11,    14,    23,    24,     5,    15,    25,    11,    16,
-       6,     7,     8,    26,     9,    10,    27,    17
+       0,     3,    39,    27,     0,    40,    30,     1,     4,    41,
+      42,    31,    27,    31,    42,    43,    30,     1,     5,    44,
+      45,    33,    27,    31,    45,    32,     6,     7,     8,     9,
+      10,    11,    12,    13,    14,    15,    46,    16,    17,    47,
+      34,    48,    18,    19,    20,    21,    22,    23,    24,    25,
+      26,    49,    50,    33,    37,    37,    37,    37,    37,    37,
+      37,    37,    37,    35,    36,    28,    28,    28,    28,    28,
+      28,    29,    29,    34,    50,    29,    51,    35,    36,    29
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    18,    20,    19,    21,    21,    23,    22,    24,    24,
-      25,    26,    26,    26,    27,    27,    27
+       0,    38,    40,    39,    41,    41,    43,    42,    42,    44,
+      44,    45,    45,    46,    46,    46,    46,    46,    46,    46,
+      46,    46,    46,    47,    47,    48,    48,    49,    49,    50,
+      50,    50,    50,    50,    50,    50,    50,    50,    51,    51
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     6,     0,     2,     0,     6,     0,     2,
-       6,     1,     1,     1,     0,     1,     1
+       0,     2,     0,     6,     1,     2,     0,     6,     2,     1,
+       2,     7,     2,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     0,     3,     1,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     5,     1,     3
 };
 
 
@@ -952,8 +1066,275 @@ int yydebug;
 #endif
 
 
+/* Context of a parse error.  */
+typedef struct
+{
+  yy_state_t *yyssp;
+  yysymbol_kind_t yytoken;
+} yypcontext_t;
+
+/* Put in YYARG at most YYARGN of the expected tokens given the
+   current YYCTX, and return the number of tokens stored in YYARG.  If
+   YYARG is null, return the number of expected tokens (guaranteed to
+   be less than YYNTOKENS).  Return YYENOMEM on memory exhaustion.
+   Return 0 if there are more than YYARGN expected tokens, yet fill
+   YYARG up to YYARGN. */
+static int
+yypcontext_expected_tokens (const yypcontext_t *yyctx,
+                            yysymbol_kind_t yyarg[], int yyargn)
+{
+  /* Actual size of YYARG. */
+  int yycount = 0;
+  int yyn = yypact[+*yyctx->yyssp];
+  if (!yypact_value_is_default (yyn))
+    {
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+         YYCHECK.  In other words, skip the first -YYN actions for
+         this state because they are default actions.  */
+      int yyxbegin = yyn < 0 ? -yyn : 0;
+      /* Stay within bounds of both yycheck and yytname.  */
+      int yychecklim = YYLAST - yyn + 1;
+      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+      int yyx;
+      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+        if (yycheck[yyx + yyn] == yyx && yyx != YYSYMBOL_YYerror
+            && !yytable_value_is_error (yytable[yyx + yyn]))
+          {
+            if (!yyarg)
+              ++yycount;
+            else if (yycount == yyargn)
+              return 0;
+            else
+              yyarg[yycount++] = YY_CAST (yysymbol_kind_t, yyx);
+          }
+    }
+  if (yyarg && yycount == 0 && 0 < yyargn)
+    yyarg[0] = YYSYMBOL_YYEMPTY;
+  return yycount;
+}
 
 
+
+
+#ifndef yystrlen
+# if defined __GLIBC__ && defined _STRING_H
+#  define yystrlen(S) (YY_CAST (YYPTRDIFF_T, strlen (S)))
+# else
+/* Return the length of YYSTR.  */
+static YYPTRDIFF_T
+yystrlen (const char *yystr)
+{
+  YYPTRDIFF_T yylen;
+  for (yylen = 0; yystr[yylen]; yylen++)
+    continue;
+  return yylen;
+}
+# endif
+#endif
+
+#ifndef yystpcpy
+# if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
+#  define yystpcpy stpcpy
+# else
+/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
+   YYDEST.  */
+static char *
+yystpcpy (char *yydest, const char *yysrc)
+{
+  char *yyd = yydest;
+  const char *yys = yysrc;
+
+  while ((*yyd++ = *yys++) != '\0')
+    continue;
+
+  return yyd - 1;
+}
+# endif
+#endif
+
+#ifndef yytnamerr
+/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
+   quotes and backslashes, so that it's suitable for yyerror.  The
+   heuristic is that double-quoting is unnecessary unless the string
+   contains an apostrophe, a comma, or backslash (other than
+   backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
+   null, do not copy; instead, return the length of what the result
+   would have been.  */
+static YYPTRDIFF_T
+yytnamerr (char *yyres, const char *yystr)
+{
+  if (*yystr == '"')
+    {
+      YYPTRDIFF_T yyn = 0;
+      char const *yyp = yystr;
+      for (;;)
+        switch (*++yyp)
+          {
+          case '\'':
+          case ',':
+            goto do_not_strip_quotes;
+
+          case '\\':
+            if (*++yyp != '\\')
+              goto do_not_strip_quotes;
+            else
+              goto append;
+
+          append:
+          default:
+            if (yyres)
+              yyres[yyn] = *yyp;
+            yyn++;
+            break;
+
+          case '"':
+            if (yyres)
+              yyres[yyn] = '\0';
+            return yyn;
+          }
+    do_not_strip_quotes: ;
+    }
+
+  if (yyres)
+    return yystpcpy (yyres, yystr) - yyres;
+  else
+    return yystrlen (yystr);
+}
+#endif
+
+
+static int
+yy_syntax_error_arguments (const yypcontext_t *yyctx,
+                           yysymbol_kind_t yyarg[], int yyargn)
+{
+  /* Actual size of YYARG. */
+  int yycount = 0;
+  /* There are many possibilities here to consider:
+     - If this state is a consistent state with a default action, then
+       the only way this function was invoked is if the default action
+       is an error action.  In that case, don't check for expected
+       tokens because there are none.
+     - The only way there can be no lookahead present (in yychar) is if
+       this state is a consistent state with a default action.  Thus,
+       detecting the absence of a lookahead is sufficient to determine
+       that there is no unexpected or expected token to report.  In that
+       case, just report a simple "syntax error".
+     - Don't assume there isn't a lookahead just because this state is a
+       consistent state with a default action.  There might have been a
+       previous inconsistent state, consistent state with a non-default
+       action, or user semantic action that manipulated yychar.
+     - Of course, the expected token list depends on states to have
+       correct lookahead information, and it depends on the parser not
+       to perform extra reductions after fetching a lookahead from the
+       scanner and before detecting a syntax error.  Thus, state merging
+       (from LALR or IELR) and default reductions corrupt the expected
+       token list.  However, the list is correct for canonical LR with
+       one exception: it will still contain any token that will not be
+       accepted due to an error action in a later state.
+  */
+  if (yyctx->yytoken != YYSYMBOL_YYEMPTY)
+    {
+      int yyn;
+      if (yyarg)
+        yyarg[yycount] = yyctx->yytoken;
+      ++yycount;
+      yyn = yypcontext_expected_tokens (yyctx,
+                                        yyarg ? yyarg + 1 : yyarg, yyargn - 1);
+      if (yyn == YYENOMEM)
+        return YYENOMEM;
+      else
+        yycount += yyn;
+    }
+  return yycount;
+}
+
+/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
+   about the unexpected token YYTOKEN for the state stack whose top is
+   YYSSP.
+
+   Return 0 if *YYMSG was successfully written.  Return -1 if *YYMSG is
+   not large enough to hold the message.  In that case, also set
+   *YYMSG_ALLOC to the required number of bytes.  Return YYENOMEM if the
+   required number of bytes is too large to store.  */
+static int
+yysyntax_error (YYPTRDIFF_T *yymsg_alloc, char **yymsg,
+                const yypcontext_t *yyctx)
+{
+  enum { YYARGS_MAX = 5 };
+  /* Internationalized format string. */
+  const char *yyformat = YY_NULLPTR;
+  /* Arguments of yyformat: reported tokens (one for the "unexpected",
+     one per "expected"). */
+  yysymbol_kind_t yyarg[YYARGS_MAX];
+  /* Cumulated lengths of YYARG.  */
+  YYPTRDIFF_T yysize = 0;
+
+  /* Actual size of YYARG. */
+  int yycount = yy_syntax_error_arguments (yyctx, yyarg, YYARGS_MAX);
+  if (yycount == YYENOMEM)
+    return YYENOMEM;
+
+  switch (yycount)
+    {
+#define YYCASE_(N, S)                       \
+      case N:                               \
+        yyformat = S;                       \
+        break
+    default: /* Avoid compiler warnings. */
+      YYCASE_(0, YY_("syntax error"));
+      YYCASE_(1, YY_("syntax error, unexpected %s"));
+      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+#undef YYCASE_
+    }
+
+  /* Compute error message size.  Don't count the "%s"s, but reserve
+     room for the terminator.  */
+  yysize = yystrlen (yyformat) - 2 * yycount + 1;
+  {
+    int yyi;
+    for (yyi = 0; yyi < yycount; ++yyi)
+      {
+        YYPTRDIFF_T yysize1
+          = yysize + yytnamerr (YY_NULLPTR, yytname[yyarg[yyi]]);
+        if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
+          yysize = yysize1;
+        else
+          return YYENOMEM;
+      }
+  }
+
+  if (*yymsg_alloc < yysize)
+    {
+      *yymsg_alloc = 2 * yysize;
+      if (! (yysize <= *yymsg_alloc
+             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
+        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
+      return -1;
+    }
+
+  /* Avoid sprintf, as that infringes on the user's name space.
+     Don't have undefined behavior even if the translation
+     produced a string with the wrong number of "%s"s.  */
+  {
+    char *yyp = *yymsg;
+    int yyi = 0;
+    while ((*yyp = *yyformat) != '\0')
+      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
+        {
+          yyp += yytnamerr (yyp, yytname[yyarg[yyi++]]);
+          yyformat += 2;
+        }
+      else
+        {
+          ++yyp;
+          ++yyformat;
+        }
+  }
+  return 0;
+}
 
 
 /*-----------------------------------------------.
@@ -1022,7 +1403,10 @@ yyparse (void)
      action routines.  */
   YYSTYPE yyval;
 
-
+  /* Buffer for error messages, and its allocated size.  */
+  char yymsgbuf[128];
+  char *yymsg = yymsgbuf;
+  YYPTRDIFF_T yymsg_alloc = sizeof yymsgbuf;
 
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
 
@@ -1233,69 +1617,295 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 92 "parser.y"
-                          { init_form((yyvsp[-1].str)); }
-#line 1239 "y.tab.c"
+#line 114 "parser.y"
+                      {
+        current_form = create_form((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1626 "y.tab.c"
     break;
 
-  case 3: /* form: FORM IDENTIFIER '{' $@1 sections '}'  */
-#line 92 "parser.y"
-                                                          { print_form(); }
-#line 1245 "y.tab.c"
+  case 3: /* form: FORM IDENTIFIER $@1 '{' section_list '}'  */
+#line 117 "parser.y"
+                           {
+        generate_html(stdout);
+        cleanup_form(current_form);
+        current_form = NULL;
+    }
+#line 1636 "y.tab.c"
     break;
 
   case 6: /* $@2: %empty  */
-#line 99 "parser.y"
-                                { add_section((yyvsp[-1].str)); }
-#line 1251 "y.tab.c"
+#line 128 "parser.y"
+                            {
+        current_section = create_section((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1645 "y.tab.c"
     break;
 
-  case 10: /* field: FIELD IDENTIFIER ':' field_type field_attributes ';'  */
-#line 107 "parser.y"
-     {
-         add_field((yyvsp[-4].str), (yyvsp[-2].field_info).type, (yyvsp[-1].field_info).required);
-     }
-#line 1259 "y.tab.c"
+  case 7: /* section: SECTION IDENTIFIER $@2 '{' field_list '}'  */
+#line 131 "parser.y"
+                         {
+        if (current_form && current_section) {
+            add_section_to_form(current_form, current_section);
+            current_section = NULL;
+        }
+    }
+#line 1656 "y.tab.c"
     break;
 
-  case 11: /* field_type: TEXT  */
-#line 112 "parser.y"
-                 { (yyval.field_info).type = "text"; (yyval.field_info).required = 0; }
-#line 1265 "y.tab.c"
+  case 8: /* section: error '}'  */
+#line 137 "parser.y"
+                {
+        fprintf(stderr, "Error: Invalid section declaration\n");
+        yyerrok;
+    }
+#line 1665 "y.tab.c"
     break;
 
-  case 12: /* field_type: EMAIL  */
-#line 113 "parser.y"
-                  { (yyval.field_info).type = "email"; (yyval.field_info).required = 0; }
-#line 1271 "y.tab.c"
+  case 11: /* field: FIELD IDENTIFIER ':' field_type field_attribute field_attributes ';'  */
+#line 147 "parser.y"
+                                                                            {
+        if (current_section) {
+            add_field_to_section(current_section, (yyvsp[-5].str), (yyvsp[-3].field_type), (yyvsp[-2].required), (yyvsp[-1].field_attrs));
+        }
+        free((yyvsp[-5].str));
+    }
+#line 1676 "y.tab.c"
     break;
 
-  case 13: /* field_type: PASSWORD  */
-#line 114 "parser.y"
-                     { (yyval.field_info).type = "password"; (yyval.field_info).required = 0; }
-#line 1277 "y.tab.c"
+  case 12: /* field: error ';'  */
+#line 153 "parser.y"
+                {
+        fprintf(stderr, "Error: Invalid field declaration\n");
+        yyerrok;
+    }
+#line 1685 "y.tab.c"
     break;
 
-  case 14: /* field_attributes: %empty  */
-#line 117 "parser.y"
-                              { (yyval.field_info).required = 0; }
-#line 1283 "y.tab.c"
+  case 13: /* field_type: TEXT  */
+#line 159 "parser.y"
+                 { (yyval.field_type) = FIELD_TEXT; }
+#line 1691 "y.tab.c"
     break;
 
-  case 15: /* field_attributes: REQUIRED  */
-#line 118 "parser.y"
-                           { (yyval.field_info).required = 1; }
-#line 1289 "y.tab.c"
+  case 14: /* field_type: EMAIL  */
+#line 160 "parser.y"
+            { (yyval.field_type) = FIELD_EMAIL; }
+#line 1697 "y.tab.c"
     break;
 
-  case 16: /* field_attributes: OPTIONAL  */
-#line 119 "parser.y"
-                           { (yyval.field_info).required = 0; }
-#line 1295 "y.tab.c"
+  case 15: /* field_type: PASSWORD  */
+#line 161 "parser.y"
+               { (yyval.field_type) = FIELD_PASSWORD; }
+#line 1703 "y.tab.c"
+    break;
+
+  case 16: /* field_type: NUMBER  */
+#line 162 "parser.y"
+             { (yyval.field_type) = FIELD_NUMBER; }
+#line 1709 "y.tab.c"
+    break;
+
+  case 17: /* field_type: TEXTAREA  */
+#line 163 "parser.y"
+               { (yyval.field_type) = FIELD_TEXTAREA; }
+#line 1715 "y.tab.c"
+    break;
+
+  case 18: /* field_type: DATE  */
+#line 164 "parser.y"
+           { (yyval.field_type) = FIELD_DATE; }
+#line 1721 "y.tab.c"
+    break;
+
+  case 19: /* field_type: CHECKBOX  */
+#line 165 "parser.y"
+               { (yyval.field_type) = FIELD_CHECKBOX; }
+#line 1727 "y.tab.c"
+    break;
+
+  case 20: /* field_type: DROPDOWN  */
+#line 166 "parser.y"
+               { (yyval.field_type) = FIELD_DROPDOWN; }
+#line 1733 "y.tab.c"
+    break;
+
+  case 21: /* field_type: RADIO  */
+#line 167 "parser.y"
+            { (yyval.field_type) = FIELD_RADIO; }
+#line 1739 "y.tab.c"
+    break;
+
+  case 22: /* field_type: FILE_TYPE  */
+#line 168 "parser.y"
+                { (yyval.field_type) = FIELD_FILE; }
+#line 1745 "y.tab.c"
+    break;
+
+  case 23: /* field_attribute: REQUIRED  */
+#line 171 "parser.y"
+                          { (yyval.required) = 1; }
+#line 1751 "y.tab.c"
+    break;
+
+  case 24: /* field_attribute: OPTIONAL  */
+#line 172 "parser.y"
+               { (yyval.required) = 0; }
+#line 1757 "y.tab.c"
+    break;
+
+  case 25: /* field_attributes: %empty  */
+#line 175 "parser.y"
+                              {
+        FieldAttributes attrs;
+        init_field_attributes(&attrs);
+        (yyval.field_attrs) = attrs;
+    }
+#line 1767 "y.tab.c"
+    break;
+
+  case 26: /* field_attributes: '[' attribute_list ']'  */
+#line 180 "parser.y"
+                             { (yyval.field_attrs) = (yyvsp[-1].field_attrs); }
+#line 1773 "y.tab.c"
+    break;
+
+  case 27: /* attribute_list: attribute  */
+#line 183 "parser.y"
+                          { (yyval.field_attrs) = (yyvsp[0].field_attrs); }
+#line 1779 "y.tab.c"
+    break;
+
+  case 28: /* attribute_list: attribute_list ',' attribute  */
+#line 184 "parser.y"
+                                   {
+        (yyval.field_attrs) = (yyvsp[0].field_attrs);
+        (yyval.field_attrs).min_length = ((yyvsp[-2].field_attrs).min_length != -1) ? (yyvsp[-2].field_attrs).min_length : (yyvsp[0].field_attrs).min_length;
+        (yyval.field_attrs).max_length = ((yyvsp[-2].field_attrs).max_length != -1) ? (yyvsp[-2].field_attrs).max_length : (yyvsp[0].field_attrs).max_length;
+        (yyval.field_attrs).min_value = ((yyvsp[-2].field_attrs).min_value != -1) ? (yyvsp[-2].field_attrs).min_value : (yyvsp[0].field_attrs).min_value;
+        (yyval.field_attrs).max_value = ((yyvsp[-2].field_attrs).max_value != -1) ? (yyvsp[-2].field_attrs).max_value : (yyvsp[0].field_attrs).max_value;
+        (yyval.field_attrs).rows = ((yyvsp[-2].field_attrs).rows != -1) ? (yyvsp[-2].field_attrs).rows : (yyvsp[0].field_attrs).rows;
+        (yyval.field_attrs).cols = ((yyvsp[-2].field_attrs).cols != -1) ? (yyvsp[-2].field_attrs).cols : (yyvsp[0].field_attrs).cols;
+        (yyval.field_attrs).pattern = ((yyvsp[-2].field_attrs).pattern != NULL) ? (yyvsp[-2].field_attrs).pattern : (yyvsp[0].field_attrs).pattern;
+        (yyval.field_attrs).default_value = ((yyvsp[-2].field_attrs).default_value != NULL) ? (yyvsp[-2].field_attrs).default_value : (yyvsp[0].field_attrs).default_value;
+        (yyval.field_attrs).options = ((yyvsp[-2].field_attrs).options != NULL) ? (yyvsp[-2].field_attrs).options : (yyvsp[0].field_attrs).options;
+        (yyval.field_attrs).option_count = ((yyvsp[-2].field_attrs).options != NULL) ? (yyvsp[-2].field_attrs).option_count : (yyvsp[0].field_attrs).option_count;
+    }
+#line 1797 "y.tab.c"
+    break;
+
+  case 29: /* attribute: MIN_LENGTH '=' NUMBER_LITERAL  */
+#line 199 "parser.y"
+                                         {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).min_length = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1807 "y.tab.c"
+    break;
+
+  case 30: /* attribute: MAX_LENGTH '=' NUMBER_LITERAL  */
+#line 204 "parser.y"
+                                    {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).max_length = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1817 "y.tab.c"
+    break;
+
+  case 31: /* attribute: MIN '=' NUMBER_LITERAL  */
+#line 209 "parser.y"
+                             {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).min_value = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1827 "y.tab.c"
+    break;
+
+  case 32: /* attribute: MAX '=' NUMBER_LITERAL  */
+#line 214 "parser.y"
+                             {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).max_value = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1837 "y.tab.c"
+    break;
+
+  case 33: /* attribute: ROWS '=' NUMBER_LITERAL  */
+#line 219 "parser.y"
+                              {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).rows = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1847 "y.tab.c"
+    break;
+
+  case 34: /* attribute: COLS '=' NUMBER_LITERAL  */
+#line 224 "parser.y"
+                              {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).cols = atoi((yyvsp[0].str));
+        free((yyvsp[0].str));
+    }
+#line 1857 "y.tab.c"
+    break;
+
+  case 35: /* attribute: PATTERN '=' STRING_LITERAL  */
+#line 229 "parser.y"
+                                 {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).pattern = (yyvsp[0].str);
+    }
+#line 1866 "y.tab.c"
+    break;
+
+  case 36: /* attribute: DEFAULT '=' STRING_LITERAL  */
+#line 233 "parser.y"
+                                 {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).default_value = (yyvsp[0].str);
+    }
+#line 1875 "y.tab.c"
+    break;
+
+  case 37: /* attribute: OPTIONS '=' '[' option_list ']'  */
+#line 237 "parser.y"
+                                      {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).options = (yyvsp[-1].option_list).options;
+        (yyval.field_attrs).option_count = (yyvsp[-1].option_list).count;
+    }
+#line 1885 "y.tab.c"
+    break;
+
+  case 38: /* option_list: STRING_LITERAL  */
+#line 244 "parser.y"
+                            {
+        (yyval.option_list).options = malloc(sizeof(char*));
+        (yyval.option_list).options[0] = (yyvsp[0].str);
+        (yyval.option_list).count = 1;
+    }
+#line 1895 "y.tab.c"
+    break;
+
+  case 39: /* option_list: option_list ',' STRING_LITERAL  */
+#line 249 "parser.y"
+                                     {
+        (yyval.option_list).count = (yyvsp[-2].option_list).count + 1;
+        (yyval.option_list).options = realloc((yyvsp[-2].option_list).options, (yyval.option_list).count * sizeof(char*));
+        (yyval.option_list).options[(yyval.option_list).count - 1] = (yyvsp[0].str);
+    }
+#line 1905 "y.tab.c"
     break;
 
 
-#line 1299 "y.tab.c"
+#line 1909 "y.tab.c"
 
       default: break;
     }
@@ -1342,7 +1952,37 @@ yyerrlab:
   if (!yyerrstatus)
     {
       ++yynerrs;
-      yyerror (YY_("syntax error"));
+      {
+        yypcontext_t yyctx
+          = {yyssp, yytoken};
+        char const *yymsgp = YY_("syntax error");
+        int yysyntax_error_status;
+        yysyntax_error_status = yysyntax_error (&yymsg_alloc, &yymsg, &yyctx);
+        if (yysyntax_error_status == 0)
+          yymsgp = yymsg;
+        else if (yysyntax_error_status == -1)
+          {
+            if (yymsg != yymsgbuf)
+              YYSTACK_FREE (yymsg);
+            yymsg = YY_CAST (char *,
+                             YYSTACK_ALLOC (YY_CAST (YYSIZE_T, yymsg_alloc)));
+            if (yymsg)
+              {
+                yysyntax_error_status
+                  = yysyntax_error (&yymsg_alloc, &yymsg, &yyctx);
+                yymsgp = yymsg;
+              }
+            else
+              {
+                yymsg = yymsgbuf;
+                yymsg_alloc = sizeof yymsgbuf;
+                yysyntax_error_status = YYENOMEM;
+              }
+          }
+        yyerror (yymsgp);
+        if (yysyntax_error_status == YYENOMEM)
+          YYNOMEM;
+      }
     }
 
   if (yyerrstatus == 3)
@@ -1484,34 +2124,20 @@ yyreturnlab:
   if (yyss != yyssa)
     YYSTACK_FREE (yyss);
 #endif
-
+  if (yymsg != yymsgbuf)
+    YYSTACK_FREE (yymsg);
   return yyresult;
 }
 
-#line 122 "parser.y"
+#line 256 "parser.y"
 
 
 void yyerror(const char *s) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
 }
 
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        FILE *file = fopen(argv[1], "r");
-        if (!file) {
-            fprintf(stderr, "Error: Cannot open file %s\n", argv[1]);
-            return 1;
-        }
-        yyin = file;
-    }
-    
-    printf("Starting parser...\n");
-    int result = yyparse();
-    printf("Parser finished with result: %d\n", result);
-    
-    if (argc > 1) {
-        fclose(yyin);
-    }
-    
-    return result;
+int main() {
+    yydebug = 1;  // Enable debug mode
+    yyparse();
+    return 0;
 }

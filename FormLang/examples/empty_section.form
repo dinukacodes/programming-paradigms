@@ -1,0 +1,9 @@
+form EmptySection {
+    section UserInfo {
+    }
+    
+    section Contact {
+        field email: email required;
+        field phone: number optional;
+    }
+} 

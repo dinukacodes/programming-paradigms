@@ -1,0 +1,14 @@
+form MultipleEmptySections {
+    section Personal {
+    }
+    
+    section Contact {
+    }
+    
+    section Preferences {
+    }
+    
+    section Security {
+        field password: password required;
+    }
+} 

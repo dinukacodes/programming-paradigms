@@ -1,0 +1,19 @@
+form ComplexForm {
+    section PersonalInfo {
+        field fullName: text required;
+        field email: email required;
+        field phone: number optional;
+        field age: number required;
+    }
+    
+    section Security {
+        field username: text required;
+        field password: password required;
+        field confirmPassword: password required;
+    }
+    
+    section Preferences {
+        field theme: text optional;
+        field notifications: text optional;
+    }
+} 

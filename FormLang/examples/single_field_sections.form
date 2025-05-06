@@ -1,0 +1,17 @@
+form SingleFieldSections {
+    section Name {
+        field fullName: text required;
+    }
+    
+    section Email {
+        field email: email required;
+    }
+    
+    section Password {
+        field password: password required;
+    }
+    
+    section Phone {
+        field phone: number optional;
+    }
+} 

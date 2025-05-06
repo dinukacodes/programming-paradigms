@@ -1,0 +1,11 @@
+form MixedAttributes {
+    section User {
+        field name: text required;
+        field nickname: text optional;
+        field email: email required;
+        field secondaryEmail: email optional;
+        field password: password required;
+        field age: number optional;
+        field phone: number required;
+    }
+} 

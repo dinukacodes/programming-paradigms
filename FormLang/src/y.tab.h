@@ -39,7 +39,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -60,11 +60,27 @@ extern int yydebug;
     TEXT = 261,                    /* TEXT  */
     EMAIL = 262,                   /* EMAIL  */
     PASSWORD = 263,                /* PASSWORD  */
-    REQUIRED = 264,                /* REQUIRED  */
-    OPTIONAL = 265,                /* OPTIONAL  */
-    IDENTIFIER = 266,              /* IDENTIFIER  */
-    STRING_LITERAL = 267,          /* STRING_LITERAL  */
-    NUMBER = 268                   /* NUMBER  */
+    NUMBER = 264,                  /* NUMBER  */
+    TEXTAREA = 265,                /* TEXTAREA  */
+    DATE = 266,                    /* DATE  */
+    CHECKBOX = 267,                /* CHECKBOX  */
+    DROPDOWN = 268,                /* DROPDOWN  */
+    RADIO = 269,                   /* RADIO  */
+    FILE_TYPE = 270,               /* FILE_TYPE  */
+    REQUIRED = 271,                /* REQUIRED  */
+    OPTIONAL = 272,                /* OPTIONAL  */
+    MIN_LENGTH = 273,              /* MIN_LENGTH  */
+    MAX_LENGTH = 274,              /* MAX_LENGTH  */
+    MIN = 275,                     /* MIN  */
+    MAX = 276,                     /* MAX  */
+    ROWS = 277,                    /* ROWS  */
+    COLS = 278,                    /* COLS  */
+    PATTERN = 279,                 /* PATTERN  */
+    DEFAULT = 280,                 /* DEFAULT  */
+    OPTIONS = 281,                 /* OPTIONS  */
+    IDENTIFIER = 282,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 283,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 284           /* STRING_LITERAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -79,26 +95,44 @@ extern int yydebug;
 #define TEXT 261
 #define EMAIL 262
 #define PASSWORD 263
-#define REQUIRED 264
-#define OPTIONAL 265
-#define IDENTIFIER 266
-#define STRING_LITERAL 267
-#define NUMBER 268
+#define NUMBER 264
+#define TEXTAREA 265
+#define DATE 266
+#define CHECKBOX 267
+#define DROPDOWN 268
+#define RADIO 269
+#define FILE_TYPE 270
+#define REQUIRED 271
+#define OPTIONAL 272
+#define MIN_LENGTH 273
+#define MAX_LENGTH 274
+#define MIN 275
+#define MAX 276
+#define ROWS 277
+#define COLS 278
+#define PATTERN 279
+#define DEFAULT 280
+#define OPTIONS 281
+#define IDENTIFIER 282
+#define NUMBER_LITERAL 283
+#define STRING_LITERAL 284
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 72 "parser.y"
+#line 89 "parser.y"
 
-    int num;
     char *str;
+    int required;
+    FieldType field_type;
+    FieldAttributes field_attrs;
     struct {
-        char *type;
-        int required;
-    } field_info;
+        char** options;
+        int count;
+    } option_list;
 
-#line 102 "y.tab.h"
+#line 136 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
