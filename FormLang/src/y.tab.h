@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_PARSER_TAB_H_INCLUDED
-# define YY_YY_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -54,33 +54,51 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    IDENTIFIER = 258,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 259,          /* NUMBER_LITERAL  */
-    FORM = 260,                    /* FORM  */
-    SECTION = 261,                 /* SECTION  */
-    FIELD = 262,                   /* FIELD  */
-    TEXT = 263,                    /* TEXT  */
-    EMAIL = 264,                   /* EMAIL  */
-    PASSWORD = 265,                /* PASSWORD  */
-    NUMBER = 266,                  /* NUMBER  */
-    REQUIRED = 267,                /* REQUIRED  */
-    OPTIONAL = 268                 /* OPTIONAL  */
+    FORM = 258,                    /* FORM  */
+    SECTION = 259,                 /* SECTION  */
+    FIELD = 260,                   /* FIELD  */
+    TEXT = 261,                    /* TEXT  */
+    EMAIL = 262,                   /* EMAIL  */
+    PASSWORD = 263,                /* PASSWORD  */
+    REQUIRED = 264,                /* REQUIRED  */
+    OPTIONAL = 265,                /* OPTIONAL  */
+    IDENTIFIER = 266,              /* IDENTIFIER  */
+    STRING_LITERAL = 267,          /* STRING_LITERAL  */
+    NUMBER = 268                   /* NUMBER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
+#define FORM 258
+#define SECTION 259
+#define FIELD 260
+#define TEXT 261
+#define EMAIL 262
+#define PASSWORD 263
+#define REQUIRED 264
+#define OPTIONAL 265
+#define IDENTIFIER 266
+#define STRING_LITERAL 267
+#define NUMBER 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 88 "parser.y"
+#line 72 "parser.y"
 
-    char* str;
     int num;
-    enum FieldType field_type;
-    int required;
+    char *str;
+    struct {
+        char *type;
+        int required;
+    } field_info;
 
-#line 84 "parser.tab.h"
+#line 102 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -95,4 +113,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

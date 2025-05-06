@@ -1,7 +1,12 @@
 form Registration {
     section Personal {
-        field username: text required;
+        field name: text required;
         field email: email required;
+        field phone: text optional;
+    }
+    
+    section Account {
+        field username: text required;
         field password: password required;
     }
 } 

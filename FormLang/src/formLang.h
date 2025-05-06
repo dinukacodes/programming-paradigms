@@ -5,32 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Token types */
-#define FORM 1000
-#define SECTION 1001
-#define FIELD 1002
-#define TEXT 1003
-#define EMAIL 1004
-#define PASSWORD 1005
-#define REQUIRED 1006
-#define OPTIONAL 1007
-#define IDENTIFIER 1008
-#define STRING_LITERAL 1009
-#define NUMBER 1010
-
-/* Union for yylval */
-typedef union {
-    int num;
-    char *str;
-} YYSTYPE;
-
-extern YYSTYPE yylval;
-
-/* Basic structures for the AST */
+// Type definitions
 typedef struct {
     char *name;
     char *type;
-    int is_required;
+    int required;
 } Field;
 
 typedef struct {
@@ -45,9 +24,22 @@ typedef struct {
     int section_count;
 } Form;
 
-/* Function declarations */
-void yyerror(const char *s);
-int yylex(void);
-int yyparse(void);
+// External declarations
+extern int yylineno;
+extern int yylex(void);
+extern int yyparse(void);
+extern void yyerror(const char *s);
+
+// Global variables
+extern Form current_form;
+extern Section current_section;
+extern Field current_field;
+
+// Function declarations
+void generate_html();
+void init_form(const char *name);
+void add_section(const char *name);
+void add_field(const char *name, const char *type, int required);
+void print_form();
 
 #endif /* FORMLANG_H */
