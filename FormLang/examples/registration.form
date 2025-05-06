@@ -1,0 +1,7 @@
+form Registration {
+    section Personal {
+        field username: text required;
+        field email: email required;
+        field password: password required;
+    }
+} 
