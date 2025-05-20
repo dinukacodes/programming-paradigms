@@ -47,10 +47,25 @@
   - [x] Password strength validation
   - [x] Email format validation
 
-
+## Milestone 5: Registration-Specific Fields 🟡
+- [x] Specialized field types
+  - [x] Username field with pattern validation
+  - [x] Password field with strength validation
+  - [x] Confirmable email fields
+  - [x] Address fields with sub-components
+- [x] Enhanced validation
+  - [x] Password strength checking
+  - [x] Field confirmation logic
+  - [x] Custom error messages
+  - [x] Address subfield validation
+- [ ] Parser improvements needed
+  - [ ] Complex validation expressions
+  - [ ] Specialized field type handling
+  - [ ] Address subfield validation
+  - [ ] Error handling for validation blocks
 
 ## Current Status
-- All basic and extended field types implemented and tested
+- Basic and extended field types implemented and tested
 - Comprehensive validation system in place
 - Client-side validation working with real-time feedback
 - Test suite covers all implemented features
@@ -58,8 +73,8 @@
 - Documentation updated with latest features
 
 ## Next Steps
-1. Implement progressive disclosure features
-2. Add support for multi-step forms
-3. Enhance styling and accessibility
-4. Add more comprehensive error recovery
+1. Fix parser issues with complex validation expressions
+2. Improve specialized field type handling
+3. Enhance address subfield validation
+4. Add more comprehensive error handling
 5. Expand test coverage for edge cases 
