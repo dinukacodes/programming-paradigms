@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "formLang.h"
-#include "parser.tab.h"
+#include "y.tab.h"
 
 extern YYSTYPE yylval;
 
@@ -53,10 +53,21 @@ char* process_string(const char* input) {
 "form"      { return FORM; }
 "section"   { return SECTION; }
 "field"     { return FIELD; }
+"validate"  { return VALIDATE; }
+"if"        { return IF; }
+"error"     { return ERROR; }
 ":"         { after_colon = 1; return ':'; }
 ";"         { after_colon = 0; return ';'; }
 "{"         { return '{'; }
 "}"         { return '}'; }
+"<"         { return LT; }
+">"         { return GT; }
+"<="        { return LTE; }
+">="        { return GTE; }
+"=="        { return EQ; }
+"!="        { return NEQ; }
+"&&"        { return AND; }
+"||"        { return OR; }
 
 "text"      { 
     if (after_colon) {
@@ -149,6 +160,25 @@ char* process_string(const char* input) {
 "cols"      { return COLS; }
 "pattern"   { return PATTERN; }
 "default"   { return DEFAULT; }
+
+"username"  {
+    if (after_colon) {
+        after_colon = 0;
+        return USERNAME;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"confirm"   { return CONFIRM; }
+"strength"  { return STRENGTH; }
+"address"   {
+    if (after_colon) {
+        after_colon = 0;
+        return ADDRESS;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
 
 [a-zA-Z_][a-zA-Z0-9_]* { 
     yylval.str = strdup(yytext);

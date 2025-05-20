@@ -1,0 +1,17 @@
+form Milestone5Simple {
+    section UserInfo {
+        field username: username required minLength 4 maxLength 16;
+        field password: password required strength 3;
+        field confirmPassword: password required confirm password;
+    }
+
+    section AddressInfo {
+        field homeAddress: address required;
+    }
+
+    validate {
+        if username == 0 { error "Username is required."; }
+        if password == 0 { error "Password is required."; }
+        if confirmPassword != password { error "Passwords do not match."; }
+    }
+} 

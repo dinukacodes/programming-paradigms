@@ -1,0 +1,24 @@
+form Milestone5Test {
+    section UserInfo {
+        field username: username required minLength 4 maxLength 16 pattern "^[a-zA-Z0-9_]+$";
+        field password: password required strength 3;
+        field confirmPassword: password required confirm password;
+        field email: email required;
+        field confirmEmail: email required confirm email;
+    }
+
+    section AddressInfo {
+        field homeAddress: address required;
+        field workAddress: address optional;
+    }
+
+    validate {
+        if username == 0 { error "Username is required."; }
+        if password == 0 { error "Password is required."; }
+        if confirmPassword != password { error "Passwords do not match."; }
+        if email == 0 { error "Email is required."; }
+        if confirmEmail != email { error "Email addresses do not match."; }
+        if homeAddress_street == 0 { error "Home address street is required."; }
+        if homeAddress_zip < 10000 { error "Home address ZIP must be at least 5 digits."; }
+    }
+} 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "formLang.h"
 
 void generate_html_header(FILE* output) {
@@ -80,6 +81,8 @@ void generate_section_html(FILE* output, Section* section) {
             case FIELD_DROPDOWN: type = "select"; break;
             case FIELD_RADIO: type = "radio"; break;
             case FIELD_FILE: type = "file"; break;
+            case FIELD_USERNAME: type = "text"; break;
+            case FIELD_ADDRESS: type = "text"; break;
         }
 
         if (field->type == FIELD_TEXTAREA) {
@@ -109,63 +112,104 @@ void generate_section_html(FILE* output, Section* section) {
             fprintf(output, ">\n");
             fprintf(output, "  <span>Option 2</span>\n");
             fprintf(output, "</div>\n");
+        } else if (field->type == FIELD_ADDRESS) {
+            fprintf(output, "<div class=\"address-group\">\n");
+            fprintf(output, "<input type=\"text\" id=\"%s_street\" name=\"%s_street\" placeholder=\"Street\" required>\n", field->name, field->name);
+            fprintf(output, "<input type=\"text\" id=\"%s_city\" name=\"%s_city\" placeholder=\"City\" required>\n", field->name, field->name);
+            fprintf(output, "<input type=\"text\" id=\"%s_state\" name=\"%s_state\" placeholder=\"State\" required>\n", field->name, field->name);
+            fprintf(output, "<input type=\"text\" id=\"%s_zip\" name=\"%s_zip\" placeholder=\"ZIP\" required>\n", field->name, field->name);
+            fprintf(output, "<input type=\"text\" id=\"%s_country\" name=\"%s_country\" placeholder=\"Country\" required>\n", field->name, field->name);
+            fprintf(output, "</div>\n");
         } else {
-            fprintf(output, "<input type=\"%s\" id=\"%s\" name=\"%s\"", type, field->name, field->name);
-            
-            // Handle required attribute
-            if (field->attributes.required) {
-                fprintf(output, " required");
-            }
-            
-            // Handle length constraints
-            if (field->attributes.min_length > 0) {
-                fprintf(output, " minlength=\"%d\"", field->attributes.min_length);
-            }
-            if (field->attributes.max_length > 0) {
-                fprintf(output, " maxlength=\"%d\"", field->attributes.max_length);
-            }
-            
-            // Handle number constraints
+            const char* input_type = type;
+            if (field->type == FIELD_USERNAME) input_type = "text";
+            if (field->type == FIELD_PASSWORD) input_type = "password";
+            if (field->type == FIELD_EMAIL) input_type = "email";
+            fprintf(output, "<input type=\"%s\" id=\"%s\" name=\"%s\"", input_type, field->name, field->name);
+            if (field->attributes.required) fprintf(output, " required");
+            if (field->attributes.min_length > 0) fprintf(output, " minlength=\"%d\"", field->attributes.min_length);
+            if (field->attributes.max_length > 0) fprintf(output, " maxlength=\"%d\"", field->attributes.max_length);
             if (field->type == FIELD_NUMBER) {
-                if (field->attributes.min_value != 0) {
-                    fprintf(output, " min=\"%d\"", field->attributes.min_value);
-                }
-                if (field->attributes.max_value != 0) {
-                    fprintf(output, " max=\"%d\"", field->attributes.max_value);
-                }
+                if (field->attributes.min_value != 0) fprintf(output, " min=\"%d\"", field->attributes.min_value);
+                if (field->attributes.max_value != 0) fprintf(output, " max=\"%d\"", field->attributes.max_value);
             }
-            
-            // Handle pattern
             if (field->attributes.pattern && strlen(field->attributes.pattern) > 0) {
                 char* escaped_pattern = escape_html_attr(field->attributes.pattern);
                 fprintf(output, " pattern=\"%s\"", escaped_pattern);
                 free(escaped_pattern);
             }
-            
-            // Handle default value
             if (field->attributes.default_value) {
                 char* escaped_value = escape_html_attr(field->attributes.default_value);
                 fprintf(output, " value=\"%s\"", escaped_value);
                 free(escaped_value);
             }
-            
-            // Handle file type
-            if (field->type == FIELD_FILE) {
-                fprintf(output, " accept=\"*/*\"");
-            }
-            
-            // Handle checkbox
-            if (field->type == FIELD_CHECKBOX && field->attributes.default_value) {
-                fprintf(output, " checked");
-            }
-            
+            if (field->type == FIELD_FILE) fprintf(output, " accept=\"*/*\"");
+            if (field->type == FIELD_CHECKBOX && field->attributes.default_value) fprintf(output, " checked");
+            if (field->attributes.confirm_field) fprintf(output, " data-confirm=\"%s\"", field->attributes.confirm_field);
+            if (field->attributes.strength_required > 0) fprintf(output, " data-strength=\"%d\"", field->attributes.strength_required);
             fprintf(output, ">\n");
+            if (field->type == FIELD_PASSWORD && field->attributes.strength_required > 0) {
+                fprintf(output, "<meter id=\"%s_strength\" min=\"0\" max=\"4\"></meter>\n", field->name);
+            }
         }
         fprintf(stderr, "Field %d generated successfully\n", i);
     }
 
     fprintf(output, "</section>\n");
     fprintf(stderr, "Section generation complete\n");
+}
+
+static void parse_condition(const char* cond, char* field, char* op, char* value) {
+    // cond is like "score > 100" or "age < 18"
+    // Extract field, op, value
+    const char* p = cond;
+    while (*p && isspace(*p)) p++;
+    int i = 0;
+    while (*p && !isspace(*p) && *p != '<' && *p != '>' && *p != '=' && *p != '!') field[i++] = *p++;
+    field[i] = '\0';
+    while (*p && isspace(*p)) p++;
+    int j = 0;
+    if (*p == '<' || *p == '>' || *p == '=' || *p == '!') {
+        op[j++] = *p++;
+        if (*p == '=' || (*(p-1) == '<' && *p == '>')) op[j++] = *p++;
+    }
+    op[j] = '\0';
+    while (*p && isspace(*p)) p++;
+    int k = 0;
+    while (*p) value[k++] = *p++;
+    value[k] = '\0';
+}
+
+void generate_validation_js(FILE* output, Form* form) {
+    fprintf(output, "<script>\n");
+    fprintf(output, "document.addEventListener('DOMContentLoaded', function() {\n");
+    fprintf(output, "  const form = document.querySelector('form');\n");
+    fprintf(output, "  form.addEventListener('submit', function(e) {\n");
+    fprintf(output, "    let valid = true;\n");
+    fprintf(output, "    const errors = [];\n\n");
+
+    ValidationRule* rule = form->validation_rules;
+    while (rule) {
+        char field[64], op[4], value[64];
+        parse_condition(rule->condition, field, op, value);
+        fprintf(output, "    {\n");
+        fprintf(output, "      var %s = document.getElementById('%s');\n", field, field);
+        fprintf(output, "      var %sVal = %s ? %s.value : '';\n", field, field, field);
+        fprintf(output, "      if (%s && %sVal !== '' && parseFloat(%sVal) %s %s) {\n", field, field, field, op, value);
+        fprintf(output, "        errors.push(\"%s\");\n", rule->error_message);
+        fprintf(output, "        valid = false;\n");
+        fprintf(output, "      }\n");
+        fprintf(output, "    }\n");
+        rule = rule->next;
+    }
+
+    fprintf(output, "    if (!valid) {\n");
+    fprintf(output, "      e.preventDefault();\n");
+    fprintf(output, "      alert(errors.join('\\n'));\n");
+    fprintf(output, "    }\n");
+    fprintf(output, "  });\n");
+    fprintf(output, "});\n");
+    fprintf(output, "</script>\n");
 }
 
 void generate_html(FILE* output) {
@@ -188,5 +232,9 @@ void generate_html(FILE* output) {
     fprintf(output, "<input type=\"submit\" value=\"Submit\">\n");
     fprintf(output, "</form>\n");
     generate_html_footer(output);
+    
+    // Generate validation JavaScript
+    generate_validation_js(output, current_form);
+    
     fprintf(stderr, "HTML generation complete\n");
 }

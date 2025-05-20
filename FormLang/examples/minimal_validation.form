@@ -1,0 +1,9 @@
+form MinimalValidation {
+    section Main {
+        field age: number required min 0 max 120;
+    }
+    validate {
+        if age < 18 { error "You must be at least 18."; }
+        if age > 100 { error "Age cannot exceed 100."; }
+    }
+} 

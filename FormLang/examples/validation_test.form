@@ -1,4 +1,19 @@
 form ValidationTest {
+    section UserInfo {
+        field username: username required minLength 3 maxLength 20 pattern "[a-zA-Z0-9_]+";
+        field email: email required;
+        field password: password required strength 3;
+        field confirmPassword: password required confirm password;
+        field age: number required min 18 max 120;
+        field score: number required min 0 max 100;
+    }
+
+    validate {
+        if age < 18 { error "You must be at least 18 years old."; }
+        if score < 60 { error "Score must be at least 60 to pass."; }
+        if score > 100 { error "Score cannot exceed 100."; }
+    }
+
     section PatternTests {
         field empty_pattern: text pattern ".*" required;
         field complex_pattern: text pattern "^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/? ]+$" required;

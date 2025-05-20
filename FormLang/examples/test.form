@@ -1,0 +1,15 @@
+form TestForm {
+    section UserInfo {
+        field username: username required minLength 3 maxLength 20 pattern "[a-zA-Z0-9_]+";
+        field email: email required;
+        field password: password required strength 3;
+        field confirmPassword: password required confirm password;
+        field fullName: text required minLength 2 maxLength 50;
+        field age: number required min 18 max 120;
+        field address: address required;
+        field bio: textarea rows 4 cols 50;
+        field gender: radio required;
+        field country: dropdown required;
+        field terms: checkbox required;
+    }
+} 

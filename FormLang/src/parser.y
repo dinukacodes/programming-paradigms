@@ -28,6 +28,7 @@ Form* create_form(const char* name) {
     form->name = strdup(name);
     form->sections = NULL;
     form->section_count = 0;
+    form->validation_rules = NULL;
     return form;
 }
 
@@ -119,7 +120,7 @@ void add_field_to_section(Section* section, const char* name, FieldType type, Fi
     
     if (attrs->pattern) {
         field->attributes.pattern = strdup(attrs->pattern);
-            }
+    }
     if (attrs->default_value) {
         field->attributes.default_value = strdup(attrs->default_value);
     }
@@ -145,6 +146,17 @@ void cleanup_form(Form* form) {
         }
         if (form->sections) free(form->sections);
         if (form->name) free(form->name);
+        
+        // Cleanup validation rules
+        ValidationRule* rule = form->validation_rules;
+        while (rule) {
+            ValidationRule* next = rule->next;
+            if (rule->condition) free(rule->condition);
+            if (rule->error_message) free(rule->error_message);
+            free(rule);
+            rule = next;
+        }
+        
         free(form);
     }
     
@@ -157,9 +169,10 @@ void cleanup_form(Form* form) {
 }
 %}
 
-%token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER TEXTAREA DATE CHECKBOX DROPDOWN RADIO FILE_TYPE
-%token REQUIRED OPTIONAL MINLENGTH MAXLENGTH MIN MAX ROWS COLS PATTERN DEFAULT
+%token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER TEXTAREA DATE CHECKBOX DROPDOWN RADIO FILE_TYPE USERNAME ADDRESS
+%token REQUIRED OPTIONAL MINLENGTH MAXLENGTH MIN MAX ROWS COLS PATTERN DEFAULT CONFIRM STRENGTH
 %token IDENTIFIER NUMBER_LITERAL STRING_LITERAL
+%token VALIDATE IF ERROR LT GT LTE GTE EQ NEQ AND OR
 
 %union {
     char* str;
@@ -168,6 +181,7 @@ void cleanup_form(Form* form) {
     Section* section;
     FieldType field_type;
     FieldAttributes field_attrs;
+    ValidationRule* validation_rule;
 }
 
 %type <str> IDENTIFIER STRING_LITERAL
@@ -175,6 +189,7 @@ void cleanup_form(Form* form) {
 %type <form> form
 %type <field_type> field_type
 %type <field_attrs> field_attributes attribute
+%type <validation_rule> validation_block validation_rule condition
 
 %define parse.error verbose
 
@@ -188,11 +203,20 @@ form: FORM IDENTIFIER
             YYERROR;
         }
     }
-    '{' section_list '}'
+    '{' form_body '}'
     {
         generate_html(stdout);
         $$ = current_form;
     }
+    ;
+
+form_body:
+    | form_body form_item
+    ;
+
+form_item:
+      section
+    | validation_block
     ;
 
 section_list: 
@@ -266,6 +290,8 @@ field_type: TEXT     { $$ = FIELD_TEXT; }
           | DROPDOWN { $$ = FIELD_DROPDOWN; }
           | RADIO    { $$ = FIELD_RADIO; }
           | FILE_TYPE { $$ = FIELD_FILE; }
+          | USERNAME { $$ = FIELD_USERNAME; }
+          | ADDRESS  { $$ = FIELD_ADDRESS; }
           ;
 
 field_attributes: /* empty */
@@ -285,7 +311,7 @@ field_attributes: /* empty */
         if ($2.pattern) {
             if ($$.pattern) free($$.pattern);
             $$.pattern = $2.pattern;
-    }
+        }
         if ($2.default_value) {
             if ($$.default_value) free($$.default_value);
             $$.default_value = $2.default_value;
@@ -349,6 +375,75 @@ attribute: REQUIRED
     {
         init_field_attributes(&$$);
         $$.cols = $2;
+    }
+    | CONFIRM IDENTIFIER
+    {
+        init_field_attributes(&$$);
+        $$.confirm_field = $2;
+    }
+    | STRENGTH NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.strength_required = $2;
+    }
+    ;
+
+validation_blocks:
+    | validation_blocks validation_block
+    ;
+
+validation_block: VALIDATE '{' validation_rules '}'
+    ;
+
+validation_rules:
+    | validation_rules validation_rule
+    ;
+
+validation_rule: IF condition '{' ERROR STRING_LITERAL ';' '}'
+    {
+        ValidationRule* rule = malloc(sizeof(ValidationRule));
+        rule->condition = $2;
+        rule->error_message = $5;
+        rule->next = current_form->validation_rules;
+        current_form->validation_rules = rule;
+    }
+    ;
+
+condition: IDENTIFIER LT NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s < %d", $1, $3);
+        $$ = cond;
+    }
+    | IDENTIFIER GT NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s > %d", $1, $3);
+        $$ = cond;
+    }
+    | IDENTIFIER LTE NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s <= %d", $1, $3);
+        $$ = cond;
+    }
+    | IDENTIFIER GTE NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s >= %d", $1, $3);
+        $$ = cond;
+    }
+    | IDENTIFIER EQ NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s == %d", $1, $3);
+        $$ = cond;
+    }
+    | IDENTIFIER NEQ NUMBER_LITERAL
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s != %d", $1, $3);
+        $$ = cond;
     }
     ;
 

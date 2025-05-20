@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+form { background: #f5f5f5; padding: 20px; border-radius: 5px; }
+section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }
+h2 { color: #333; margin-top: 0; }
+label { display: block; margin-bottom: 5px; }
+input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
+input[type=submit]:hover { background: #45a049; }
+.radio-group { margin-bottom: 10px; }
+.radio-group label { display: inline; margin-left: 5px; }
+</style>
+</head>
+<body>
+<form>
+<section>
+<h2>AddressInfo</h2>
+<label for="address">address *</label>
+<div class="address-group">
+<input type="text" id="address_street" name="address_street" placeholder="Street" required>
+<input type="text" id="address_city" name="address_city" placeholder="City" required>
+<input type="text" id="address_state" name="address_state" placeholder="State" required>
+<input type="text" id="address_zip" name="address_zip" placeholder="ZIP" required>
+<input type="text" id="address_country" name="address_country" placeholder="Country" required>
+</div>
+<label for="zip">zip</label>
+<input type="number" id="zip" name="zip" min="10000" max="99999">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    {
+      var zip = document.getElementById('zip');
+      var zipVal = zip ? zip.value : '';
+      if (zip && zipVal !== '' && parseFloat(zipVal) > 99999) {
+        errors.push("ZIP must be at most 5 digits.");
+        valid = false;
+      }
+    }
+    {
+      var zip = document.getElementById('zip');
+      var zipVal = zip ? zip.value : '';
+      if (zip && zipVal !== '' && parseFloat(zipVal) < 10000) {
+        errors.push("ZIP must be at least 5 digits.");
+        valid = false;
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

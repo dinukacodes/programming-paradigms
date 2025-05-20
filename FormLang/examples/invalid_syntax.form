@@ -1,0 +1,10 @@
+form InvalidSyntax {
+    section Bad {
+        field missing_type;
+        field no_colon text;
+        field bad: number min "abc";
+    }
+    validate {
+        if missing_type < 0 { error "Should not parse!"; }
+    }
+} 

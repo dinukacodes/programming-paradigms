@@ -1,0 +1,9 @@
+form AddressEdge {
+    section Addr {
+        field address: address required;
+    }
+    validate {
+        if address_street == 0 { error "Street required!"; }
+        if address_zip < 10000 { error "ZIP too short!"; }
+    }
+} 

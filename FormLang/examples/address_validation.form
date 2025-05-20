@@ -1,0 +1,10 @@
+form AddressForm {
+    section AddressInfo {
+        field address: address required;
+        field zip: number required min 10000 max 99999;
+    }
+    validate {
+        if zip < 10000 { error "ZIP must be at least 5 digits."; }
+        if zip > 99999 { error "ZIP must be at most 5 digits."; }
+    }
+} 

@@ -17,9 +17,24 @@ input[type=submit]:hover { background: #45a049; }
 <body>
 <form>
 <section>
+<h2>UserInfo</h2>
+<label for="username">username</label>
+<input type="text" id="username" name="username" minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required>
+<label for="password">password</label>
+<input type="password" id="password" name="password">
+<label for="confirmPassword">confirmPassword</label>
+<input type="password" id="confirmPassword" name="confirmPassword">
+<label for="age">age</label>
+<input type="number" id="age" name="age" min="18" max="120">
+<label for="score">score</label>
+<input type="number" id="score" name="score" max="100">
+</section>
+<section>
 <h2>PatternTests</h2>
 <label for="empty_pattern">empty_pattern *</label>
-<input type="text" id="empty_pattern" name="empty_pattern" required pattern=".*">
+<input type="text" id="empty_pattern" name="empty_pattern" required pattern=".*" data-confirm="age" data-strength="7">
 <label for="complex_pattern">complex_pattern *</label>
 <input type="text" id="complex_pattern" name="complex_pattern" required pattern="^[A-Za-z0-9!@#$%^&amp;*()_+-=[]{};':&quot;\|,.&lt;&gt;/? ]+$">
 <label for="email_pattern">email_pattern *</label>
@@ -30,7 +45,7 @@ input[type=submit]:hover { background: #45a049; }
 <section>
 <h2>RequiredTests</h2>
 <label for="required_no_validation">required_no_validation *</label>
-<input type="text" id="required_no_validation" name="required_no_validation" required>
+<input type="text" id="required_no_validation" name="required_no_validation" required data-confirm="age" data-strength="7">
 <label for="required_with_pattern">required_with_pattern *</label>
 <input type="text" id="required_with_pattern" name="required_with_pattern" required pattern=".*">
 <label for="required_with_length">required_with_length *</label>
@@ -84,21 +99,21 @@ input[type=submit]:hover { background: #45a049; }
 <section>
 <h2>FileTests</h2>
 <label for="required_file">required_file *</label>
-<input type="file" id="required_file" name="required_file" required accept="*/*">
+<input type="file" id="required_file" name="required_file" required accept="*/*" data-confirm="age" data-strength="7">
 <label for="optional_file">optional_file</label>
 <input type="file" id="optional_file" name="optional_file" accept="*/*">
 </section>
 <section>
 <h2>NumberTests</h2>
 <label for="zero_range">zero_range *</label>
-<input type="number" id="zero_range" name="zero_range" required min="-1" max="-1">
+<input type="number" id="zero_range" name="zero_range" required min="-1" max="-1" data-confirm="age" data-strength="7">
 <label for="positive_range">positive_range *</label>
 <input type="number" id="positive_range" name="positive_range" required min="1" max="10">
 </section>
 <section>
 <h2>DefaultValueTests</h2>
 <label for="empty_default">empty_default *</label>
-<input type="text" id="empty_default" name="empty_default" required value="">
+<input type="text" id="empty_default" name="empty_default" required value="" data-confirm="age" data-strength="7">
 <label for="space_default">space_default *</label>
 <input type="text" id="space_default" name="space_default" required value=" ">
 <label for="special_chars">special_chars *</label>
@@ -111,7 +126,7 @@ input[type=submit]:hover { background: #45a049; }
 <section>
 <h2>MixedAttributes</h2>
 <label for="complex_field">complex_field *</label>
-<input type="text" id="complex_field" name="complex_field" required minlength="1" maxlength="100" pattern="^[A-Za-z]+$" value="test">
+<input type="text" id="complex_field" name="complex_field" required minlength="1" maxlength="100" pattern="^[A-Za-z]+$" value="test" data-confirm="age" data-strength="7">
 <label for="all_optional">all_optional</label>
 <input type="text" id="all_optional" name="all_optional" maxlength="1000" pattern=".*" value="">
 </section>
@@ -119,3 +134,41 @@ input[type=submit]:hover { background: #45a049; }
 </form>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    {
+      var score = document.getElementById('score');
+      var scoreVal = score ? score.value : '';
+      if (score && scoreVal !== '' && parseFloat(scoreVal) > 100) {
+        errors.push("Score cannot exceed 100.");
+        valid = false;
+      }
+    }
+    {
+      var score = document.getElementById('score');
+      var scoreVal = score ? score.value : '';
+      if (score && scoreVal !== '' && parseFloat(scoreVal) < 60) {
+        errors.push("Score must be at least 60 to pass.");
+        valid = false;
+      }
+    }
+    {
+      var age = document.getElementById('age');
+      var ageVal = age ? age.value : '';
+      if (age && ageVal !== '' && parseFloat(ageVal) < 18) {
+        errors.push("You must be at least 18 years old.");
+        valid = false;
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

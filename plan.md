@@ -308,113 +308,123 @@ Here's a detailed 10-milestone plan for building your FormLang++ DSL, starting w
 
 **Success criteria:** The system generates registration-specific field types with appropriate HTML and client-side validation.
 
-## Milestone 6: Validation Rules
+
+## Milestone 5: Validation Block Implementation
+
 **Estimated time: 2 hours**
 
 **Tasks:**
-1. Implement the validation block grammar:
-   - if statements with conditions
-   - error message definitions
-   - support for field comparisons
 
-2. Add semantic analysis for validation rules:
-   - Check that referenced fields exist
-   - Verify field types match operations
-   - Ensure error messages are provided
+1. Add validation block syntax to lexer and parser:
+
+   * Implement `validate` keyword and block structure
+   * Add support for conditional expressions (`if` statements)
+   * Implement comparison operators (`<`, `>`, `==`, `!=`, etc.)
+   * Define grammar rules for nested blocks
+
+2. Implement field reference and validation logic:
+
+   * Allow field references in conditions
+   * Check that referenced fields exist
+   * Handle type comparisons correctly
+   * Support error message declarations
 
 3. Generate client-side validation JavaScript:
-   - Form submission event handler
-   - Field-specific validation functions
-   - Error message display
 
-**Success criteria:** Parser can process validation blocks and generate JavaScript for client-side form validation.
+   * Form submission event handlersa
+   * Condition evaluation functions
+   * Field value retrieval logic
+   * Error message display functions
+   * Test with example: `if age < 18 { error "You must be at least 18."; }`
 
-## Milestone 7: Advanced Features
+**Success criteria:** The parser correctly handles validation blocks from the assignment brief example and generates functional JavaScript validation code.
+
+---
+
+## Milestone 6: Metadata & Pattern Support
+
+**Estimated time: 1.5 hours**
+
+**Tasks:**
+
+1. Implement metadata declaration support:
+
+   * Add `meta` keyword to lexer
+   * Create grammar rules for meta declarations
+   * Support string, number, and boolean values
+   * Store metadata in form structure
+   * Test with example: `meta author = "SE2062 Team";`
+
+2. Complete field attribute implementation:
+
+   * Add `pattern` attribute for `text`/`email`/`password` fields
+   * Ensure all required attributes work for each field type per assignment spec
+   * Implement options arrays for `dropdown` and `radio` fields
+   * Support default values across all applicable field types
+
+3. Update HTML generation for metadata and patterns:
+
+   * Add metadata as HTML comments or data attributes
+   * Translate patterns to HTML5 `pattern` attributes
+   * Generate appropriate HTML for all field attributes
+   * Ensure semantic correctness of generated HTML
+
+**Success criteria:** Parser correctly handles metadata declarations and all field attributes from the assignment specification, generating proper HTML output.
+
+---
+
+## Milestone 7: EBNF Documentation & Comprehensive Example
+
 **Estimated time: 2 hours**
 
 **Tasks:**
-1. Implement progressive disclosure:
-   - Add disclosure clauses for sections
-   - Support initial state (hidden/visible)
-   - Generate JavaScript for toggling sections
 
-2. Add field dependencies:
-   - Define syntax for field dependencies
-   - Update parser to process dependency rules
-   - Generate JavaScript to show/hide fields based on values
+1. Create formal EBNF grammar specification (`grammar.pdf`):
 
-3. Implement multi-step forms:
-   - Add step attribute to sections
-   - Generate navigation between steps
-   - Maintain state between steps
+   * Document grammar for `form`, `section`, `field`, `validate`, `meta`
 
-**Success criteria:** The system supports progressive disclosure, field dependencies, and multi-step forms.
+2. Write comprehensive example form:
 
-## Milestone 8: Error Handling & Recovery
+   * Include all field types, attributes, metadata, and validation
+   * Ensure the form is representative of all supported features
+
+3. Run parser and HTML generator on the example:
+
+   * Verify generated HTML is fully functional and valid
+   * Include JavaScript for validation
+   * Ensure metadata is present in HTML output
+
+**Success criteria:** Complete and correct grammar documentation, a comprehensive example `.form` file, and verified output.
+
+---
+
+## Milestone 8: Final Testing, Cleanup & Packaging
+
 **Estimated time: 1.5 hours**
 
 **Tasks:**
-1. Enhance error reporting:
-   - Add descriptive error messages
-   - Show error context (line and column)
-   - Provide suggestions for common mistakes
 
-2. Implement error recovery:
-   - Skip to next semicolon after errors
-   - Continue parsing after section errors
-   - Maintain partial AST after errors
+1. Perform final testing on:
 
-3. Add warning system:
-   - Identify potential issues (missing labels, etc.)
-   - Suggest best practices
-   - Allow warnings to be disabled
+   * Lexer and parser with invalid and edge-case inputs
+   * HTML output structure and validation logic
+   * Memory usage and error handling with Valgrind
 
-**Success criteria:** Parser can recover from common errors and continue parsing, providing helpful error messages.
+2. Cleanup:
 
-## Milestone 9: Optimization & Styling
-**Estimated time: 1.5 hours**
+   * Remove debug prints
+   * Organize code, comments, and folder structure
+   * Ensure consistent naming conventions
 
-**Tasks:**
-1. Add styling capabilities:
-   - Theme selection (light/dark)
-   - Custom colors and styling
-   - Responsive design options
+3. Prepare final package:
 
-2. Optimize HTML output:
-   - Minify generated HTML
-   - Group similar CSS rules
-   - Optimize JavaScript for performance
+   * Include complete documentation
+   * Final `.form` examples
+   * Source code and Makefile
+   * Instructions for building and running
 
-3. Add accessibility features:
-   - ARIA attributes
-   - Tab index management
-   - High contrast mode support
+**Success criteria:** All tests pass, output is clean, submission is structured and complete.
 
-**Success criteria:** Generated forms are styled, responsive, and accessible with optimized HTML/CSS/JS.
-
-## Milestone 10: Testing & Documentation
-**Estimated time: 1.5 hours**
-
-**Tasks:**
-1. Create comprehensive test suite:
-   - Test all field types and attributes
-   - Test validation rules
-   - Test error conditions and recovery
-   - Test HTML output in different browsers
-
-2. Write documentation:
-   - Complete grammar specification
-   - Usage examples
-   - Extension guide
-   - Command-line options
-
-3. Create demonstration video:
-   - Walk through the code structure
-   - Show parsing and HTML generation
-   - Demonstrate error handling
-   - Display the final form in action
-
-**Success criteria:** Complete test suite passes, documentation is comprehensive, and demonstration video showcases the system's capabilities.
 
 ## Implementation Strategy Notes
 

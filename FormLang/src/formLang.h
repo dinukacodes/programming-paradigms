@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Validation structure
+typedef struct ValidationRule {
+    char* condition;
+    char* error_message;
+    struct ValidationRule* next;
+} ValidationRule;
+
 // Field type definitions
 typedef enum {
     FIELD_TEXT,
@@ -16,8 +23,19 @@ typedef enum {
     FIELD_CHECKBOX,
     FIELD_DROPDOWN,
     FIELD_RADIO,
-    FIELD_FILE
+    FIELD_FILE,
+    FIELD_USERNAME,
+    FIELD_ADDRESS
 } FieldType;
+
+// Address subfields
+typedef struct {
+    char* street;
+    char* city;
+    char* state;
+    char* zip;
+    char* country;
+} AddressField;
 
 // Field attribute structure
 typedef struct {
@@ -30,6 +48,9 @@ typedef struct {
     char* pattern;
     char* default_value;
     int required;
+    char* confirm_field;
+    int strength_required;
+    AddressField* address;
 } FieldAttributes;
 
 // Structure definitions
@@ -49,6 +70,7 @@ typedef struct Form {
     char *name;
     Section **sections;
     int section_count;
+    ValidationRule* validation_rules;
 } Form;
 
 // External declarations
@@ -67,6 +89,7 @@ void generate_html(FILE* output);
 void generate_html_header(FILE* output);
 void generate_html_footer(FILE* output);
 void generate_section_html(FILE* output, Section* section);
+void generate_validation_js(FILE* output, Form* form);
 
 // Helper functions
 Form* create_form(const char* name);

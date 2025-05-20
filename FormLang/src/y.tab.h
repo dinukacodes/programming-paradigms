@@ -67,19 +67,34 @@ extern int yydebug;
     DROPDOWN = 268,                /* DROPDOWN  */
     RADIO = 269,                   /* RADIO  */
     FILE_TYPE = 270,               /* FILE_TYPE  */
-    REQUIRED = 271,                /* REQUIRED  */
-    OPTIONAL = 272,                /* OPTIONAL  */
-    MINLENGTH = 273,               /* MINLENGTH  */
-    MAXLENGTH = 274,               /* MAXLENGTH  */
-    MIN = 275,                     /* MIN  */
-    MAX = 276,                     /* MAX  */
-    ROWS = 277,                    /* ROWS  */
-    COLS = 278,                    /* COLS  */
-    PATTERN = 279,                 /* PATTERN  */
-    DEFAULT = 280,                 /* DEFAULT  */
-    IDENTIFIER = 281,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 282,          /* NUMBER_LITERAL  */
-    STRING_LITERAL = 283           /* STRING_LITERAL  */
+    USERNAME = 271,                /* USERNAME  */
+    ADDRESS = 272,                 /* ADDRESS  */
+    REQUIRED = 273,                /* REQUIRED  */
+    OPTIONAL = 274,                /* OPTIONAL  */
+    MINLENGTH = 275,               /* MINLENGTH  */
+    MAXLENGTH = 276,               /* MAXLENGTH  */
+    MIN = 277,                     /* MIN  */
+    MAX = 278,                     /* MAX  */
+    ROWS = 279,                    /* ROWS  */
+    COLS = 280,                    /* COLS  */
+    PATTERN = 281,                 /* PATTERN  */
+    DEFAULT = 282,                 /* DEFAULT  */
+    CONFIRM = 283,                 /* CONFIRM  */
+    STRENGTH = 284,                /* STRENGTH  */
+    IDENTIFIER = 285,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 286,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 287,          /* STRING_LITERAL  */
+    VALIDATE = 288,                /* VALIDATE  */
+    IF = 289,                      /* IF  */
+    ERROR = 290,                   /* ERROR  */
+    LT = 291,                      /* LT  */
+    GT = 292,                      /* GT  */
+    LTE = 293,                     /* LTE  */
+    GTE = 294,                     /* GTE  */
+    EQ = 295,                      /* EQ  */
+    NEQ = 296,                     /* NEQ  */
+    AND = 297,                     /* AND  */
+    OR = 298                       /* OR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,25 +116,40 @@ extern int yydebug;
 #define DROPDOWN 268
 #define RADIO 269
 #define FILE_TYPE 270
-#define REQUIRED 271
-#define OPTIONAL 272
-#define MINLENGTH 273
-#define MAXLENGTH 274
-#define MIN 275
-#define MAX 276
-#define ROWS 277
-#define COLS 278
-#define PATTERN 279
-#define DEFAULT 280
-#define IDENTIFIER 281
-#define NUMBER_LITERAL 282
-#define STRING_LITERAL 283
+#define USERNAME 271
+#define ADDRESS 272
+#define REQUIRED 273
+#define OPTIONAL 274
+#define MINLENGTH 275
+#define MAXLENGTH 276
+#define MIN 277
+#define MAX 278
+#define ROWS 279
+#define COLS 280
+#define PATTERN 281
+#define DEFAULT 282
+#define CONFIRM 283
+#define STRENGTH 284
+#define IDENTIFIER 285
+#define NUMBER_LITERAL 286
+#define STRING_LITERAL 287
+#define VALIDATE 288
+#define IF 289
+#define ERROR 290
+#define LT 291
+#define GT 292
+#define LTE 293
+#define GTE 294
+#define EQ 295
+#define NEQ 296
+#define AND 297
+#define OR 298
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 164 "parser.y"
+#line 177 "parser.y"
 
     char* str;
     int num;
@@ -127,8 +157,9 @@ union YYSTYPE
     Section* section;
     FieldType field_type;
     FieldAttributes field_attrs;
+    ValidationRule* validation_rule;
 
-#line 132 "y.tab.h"
+#line 163 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

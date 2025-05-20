@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y"
+#line 1 "src/parser.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,6 +98,7 @@ Form* create_form(const char* name) {
     form->name = strdup(name);
     form->sections = NULL;
     form->section_count = 0;
+    form->validation_rules = NULL;
     return form;
 }
 
@@ -215,6 +216,17 @@ void cleanup_form(Form* form) {
         }
         if (form->sections) free(form->sections);
         if (form->name) free(form->name);
+        
+        // Cleanup validation rules
+        ValidationRule* rule = form->validation_rules;
+        while (rule) {
+            ValidationRule* next = rule->next;
+            if (rule->condition) free(rule->condition);
+            if (rule->error_message) free(rule->error_message);
+            free(rule);
+            rule = next;
+        }
+        
         free(form);
     }
     
@@ -226,7 +238,7 @@ void cleanup_form(Form* form) {
     field_name_count = 0;
 }
 
-#line 230 "parser.tab.c"
+#line 242 "src/parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -249,83 +261,7 @@ void cleanup_form(Form* form) {
 #  endif
 # endif
 
-
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    FORM = 258,                    /* FORM  */
-    SECTION = 259,                 /* SECTION  */
-    FIELD = 260,                   /* FIELD  */
-    TEXT = 261,                    /* TEXT  */
-    EMAIL = 262,                   /* EMAIL  */
-    PASSWORD = 263,                /* PASSWORD  */
-    NUMBER = 264,                  /* NUMBER  */
-    TEXTAREA = 265,                /* TEXTAREA  */
-    DATE = 266,                    /* DATE  */
-    CHECKBOX = 267,                /* CHECKBOX  */
-    DROPDOWN = 268,                /* DROPDOWN  */
-    RADIO = 269,                   /* RADIO  */
-    FILE_TYPE = 270,               /* FILE_TYPE  */
-    REQUIRED = 271,                /* REQUIRED  */
-    OPTIONAL = 272,                /* OPTIONAL  */
-    MINLENGTH = 273,               /* MINLENGTH  */
-    MAXLENGTH = 274,               /* MAXLENGTH  */
-    MIN = 275,                     /* MIN  */
-    MAX = 276,                     /* MAX  */
-    ROWS = 277,                    /* ROWS  */
-    COLS = 278,                    /* COLS  */
-    PATTERN = 279,                 /* PATTERN  */
-    DEFAULT = 280,                 /* DEFAULT  */
-    IDENTIFIER = 281,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 282,          /* NUMBER_LITERAL  */
-    STRING_LITERAL = 283           /* STRING_LITERAL  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 164 "parser.y"
-
-    char* str;
-    int num;
-    Form* form;
-    Section* section;
-    FieldType field_type;
-    FieldAttributes field_attrs;
-
-#line 314 "parser.tab.c"
-
-};
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-
-int yyparse (void);
-
-
-
+#include "parser.tab.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -346,34 +282,54 @@ enum yysymbol_kind_t
   YYSYMBOL_DROPDOWN = 13,                  /* DROPDOWN  */
   YYSYMBOL_RADIO = 14,                     /* RADIO  */
   YYSYMBOL_FILE_TYPE = 15,                 /* FILE_TYPE  */
-  YYSYMBOL_REQUIRED = 16,                  /* REQUIRED  */
-  YYSYMBOL_OPTIONAL = 17,                  /* OPTIONAL  */
-  YYSYMBOL_MINLENGTH = 18,                 /* MINLENGTH  */
-  YYSYMBOL_MAXLENGTH = 19,                 /* MAXLENGTH  */
-  YYSYMBOL_MIN = 20,                       /* MIN  */
-  YYSYMBOL_MAX = 21,                       /* MAX  */
-  YYSYMBOL_ROWS = 22,                      /* ROWS  */
-  YYSYMBOL_COLS = 23,                      /* COLS  */
-  YYSYMBOL_PATTERN = 24,                   /* PATTERN  */
-  YYSYMBOL_DEFAULT = 25,                   /* DEFAULT  */
-  YYSYMBOL_IDENTIFIER = 26,                /* IDENTIFIER  */
-  YYSYMBOL_NUMBER_LITERAL = 27,            /* NUMBER_LITERAL  */
-  YYSYMBOL_STRING_LITERAL = 28,            /* STRING_LITERAL  */
-  YYSYMBOL_29_ = 29,                       /* '{'  */
-  YYSYMBOL_30_ = 30,                       /* '}'  */
-  YYSYMBOL_31_ = 31,                       /* ';'  */
-  YYSYMBOL_32_ = 32,                       /* ':'  */
-  YYSYMBOL_YYACCEPT = 33,                  /* $accept  */
-  YYSYMBOL_form = 34,                      /* form  */
-  YYSYMBOL_35_1 = 35,                      /* $@1  */
-  YYSYMBOL_section_list = 36,              /* section_list  */
-  YYSYMBOL_section = 37,                   /* section  */
-  YYSYMBOL_section_header = 38,            /* section_header  */
-  YYSYMBOL_field_list = 39,                /* field_list  */
-  YYSYMBOL_field = 40,                     /* field  */
-  YYSYMBOL_field_type = 41,                /* field_type  */
-  YYSYMBOL_field_attributes = 42,          /* field_attributes  */
-  YYSYMBOL_attribute = 43                  /* attribute  */
+  YYSYMBOL_USERNAME = 16,                  /* USERNAME  */
+  YYSYMBOL_ADDRESS = 17,                   /* ADDRESS  */
+  YYSYMBOL_REQUIRED = 18,                  /* REQUIRED  */
+  YYSYMBOL_OPTIONAL = 19,                  /* OPTIONAL  */
+  YYSYMBOL_MINLENGTH = 20,                 /* MINLENGTH  */
+  YYSYMBOL_MAXLENGTH = 21,                 /* MAXLENGTH  */
+  YYSYMBOL_MIN = 22,                       /* MIN  */
+  YYSYMBOL_MAX = 23,                       /* MAX  */
+  YYSYMBOL_ROWS = 24,                      /* ROWS  */
+  YYSYMBOL_COLS = 25,                      /* COLS  */
+  YYSYMBOL_PATTERN = 26,                   /* PATTERN  */
+  YYSYMBOL_DEFAULT = 27,                   /* DEFAULT  */
+  YYSYMBOL_CONFIRM = 28,                   /* CONFIRM  */
+  YYSYMBOL_STRENGTH = 29,                  /* STRENGTH  */
+  YYSYMBOL_IDENTIFIER = 30,                /* IDENTIFIER  */
+  YYSYMBOL_NUMBER_LITERAL = 31,            /* NUMBER_LITERAL  */
+  YYSYMBOL_STRING_LITERAL = 32,            /* STRING_LITERAL  */
+  YYSYMBOL_VALIDATE = 33,                  /* VALIDATE  */
+  YYSYMBOL_IF = 34,                        /* IF  */
+  YYSYMBOL_ERROR = 35,                     /* ERROR  */
+  YYSYMBOL_LT = 36,                        /* LT  */
+  YYSYMBOL_GT = 37,                        /* GT  */
+  YYSYMBOL_LTE = 38,                       /* LTE  */
+  YYSYMBOL_GTE = 39,                       /* GTE  */
+  YYSYMBOL_EQ = 40,                        /* EQ  */
+  YYSYMBOL_NEQ = 41,                       /* NEQ  */
+  YYSYMBOL_AND = 42,                       /* AND  */
+  YYSYMBOL_OR = 43,                        /* OR  */
+  YYSYMBOL_44_ = 44,                       /* '{'  */
+  YYSYMBOL_45_ = 45,                       /* '}'  */
+  YYSYMBOL_46_ = 46,                       /* ';'  */
+  YYSYMBOL_47_ = 47,                       /* ':'  */
+  YYSYMBOL_YYACCEPT = 48,                  /* $accept  */
+  YYSYMBOL_form = 49,                      /* form  */
+  YYSYMBOL_50_1 = 50,                      /* $@1  */
+  YYSYMBOL_form_body = 51,                 /* form_body  */
+  YYSYMBOL_form_item = 52,                 /* form_item  */
+  YYSYMBOL_section = 53,                   /* section  */
+  YYSYMBOL_section_header = 54,            /* section_header  */
+  YYSYMBOL_field_list = 55,                /* field_list  */
+  YYSYMBOL_field = 56,                     /* field  */
+  YYSYMBOL_field_type = 57,                /* field_type  */
+  YYSYMBOL_field_attributes = 58,          /* field_attributes  */
+  YYSYMBOL_attribute = 59,                 /* attribute  */
+  YYSYMBOL_validation_block = 60,          /* validation_block  */
+  YYSYMBOL_validation_rules = 61,          /* validation_rules  */
+  YYSYMBOL_validation_rule = 62,           /* validation_rule  */
+  YYSYMBOL_condition = 63                  /* condition  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -701,19 +657,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   49
+#define YYLAST   77
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  33
+#define YYNTOKENS  48
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  11
+#define YYNNTS  16
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  36
+#define YYNRULES  52
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  58
+#define YYNSTATES  91
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   283
+#define YYMAXUTOK   298
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -732,14 +688,14 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    32,    31,
+       2,     2,     2,     2,     2,     2,     2,     2,    47,    46,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    29,     2,    30,     2,     2,     2,     2,
+       2,     2,     2,    44,     2,    45,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -755,17 +711,20 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   184,   184,   183,   198,   199,   202,   206,   210,   219,
-     234,   235,   236,   244,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   272,   275,   296,   301,   306,   311,
-     316,   323,   328,   333,   338,   343,   348
+       0,   199,   199,   198,   213,   214,   218,   219,   226,   230,
+     234,   243,   258,   259,   260,   268,   283,   284,   285,   286,
+     287,   288,   289,   290,   291,   292,   293,   294,   298,   301,
+     322,   327,   332,   337,   342,   349,   354,   359,   364,   369,
+     374,   379,   384,   395,   398,   399,   402,   412,   418,   424,
+     430,   436,   442
 };
 #endif
 
@@ -783,12 +742,15 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "FORM", "SECTION",
   "FIELD", "TEXT", "EMAIL", "PASSWORD", "NUMBER", "TEXTAREA", "DATE",
-  "CHECKBOX", "DROPDOWN", "RADIO", "FILE_TYPE", "REQUIRED", "OPTIONAL",
-  "MINLENGTH", "MAXLENGTH", "MIN", "MAX", "ROWS", "COLS", "PATTERN",
-  "DEFAULT", "IDENTIFIER", "NUMBER_LITERAL", "STRING_LITERAL", "'{'",
-  "'}'", "';'", "':'", "$accept", "form", "$@1", "section_list", "section",
+  "CHECKBOX", "DROPDOWN", "RADIO", "FILE_TYPE", "USERNAME", "ADDRESS",
+  "REQUIRED", "OPTIONAL", "MINLENGTH", "MAXLENGTH", "MIN", "MAX", "ROWS",
+  "COLS", "PATTERN", "DEFAULT", "CONFIRM", "STRENGTH", "IDENTIFIER",
+  "NUMBER_LITERAL", "STRING_LITERAL", "VALIDATE", "IF", "ERROR", "LT",
+  "GT", "LTE", "GTE", "EQ", "NEQ", "AND", "OR", "'{'", "'}'", "';'", "':'",
+  "$accept", "form", "$@1", "form_body", "form_item", "section",
   "section_header", "field_list", "field", "field_type",
-  "field_attributes", "attribute", YY_NULLPTR
+  "field_attributes", "attribute", "validation_block", "validation_rules",
+  "validation_rule", "condition", YY_NULLPTR
 };
 
 static const char *
@@ -798,7 +760,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-13)
+#define YYPACT_NINF (-28)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -812,12 +774,16 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       0,    -9,    18,   -13,   -13,   -10,   -13,    -3,    -5,   -13,
-     -13,     1,   -13,    -8,    -7,   -13,   -13,    -1,    -6,    -2,
-     -13,   -13,   -13,    -4,    25,   -13,   -13,   -13,   -13,   -13,
-     -13,   -13,   -13,   -13,   -13,   -13,   -11,   -13,   -13,    14,
-      15,    16,    17,    19,    20,    21,   -12,   -13,   -13,   -13,
-     -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13
+      38,   -27,    43,   -28,   -28,     2,   -28,    -3,    17,     4,
+     -28,   -28,   -28,     1,   -28,   -28,   -28,     5,     6,    -5,
+     -28,   -28,    -1,    19,   -28,   -28,     7,    22,   -28,   -28,
+      -2,    10,   -28,     8,    25,    26,    27,    28,    29,    30,
+      31,    11,   -28,   -28,   -28,   -28,   -28,   -28,    32,   -28,
+     -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
+     -28,   -28,    16,   -13,    18,   -28,   -28,    34,    36,    37,
+      39,    40,    41,    42,     0,    45,    46,   -28,   -28,   -28,
+     -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
+     -28
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -825,26 +791,30 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     1,     0,     4,     0,     0,     3,
-       5,     0,     9,     0,    10,     8,     7,     0,     0,     0,
-       6,    11,    12,     0,     0,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,     0,    26,    27,     0,
-       0,     0,     0,     0,     0,     0,     0,    13,    25,    31,
-      32,    33,    34,    35,    36,    28,    30,    29
+       0,     0,     0,     2,     1,     0,     4,     0,     0,     0,
+       3,     5,     6,     0,     7,    11,    44,     0,    12,     0,
+      10,     9,     0,     0,    43,    45,     0,     0,     8,    13,
+       0,     0,    14,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    47,    48,    49,    50,    51,    52,     0,    16,
+      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,     0,     0,     0,    30,    31,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    15,    29,    46,
+      35,    36,    37,    38,    39,    40,    32,    34,    33,    41,
+      42
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,
-     -13
+     -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,   -28,
+     -28,   -28,   -28,   -28,   -28,   -28
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     5,     7,    10,    11,    17,    21,    35,    36,
-      48
+       0,     2,     5,     7,    11,    12,    13,    22,    29,    61,
+      63,    78,    14,    19,    25,    31
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -852,50 +822,64 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      18,     8,    13,     1,    19,    37,    38,    39,    40,    41,
-      42,    43,    44,    45,    46,    56,    57,     3,     4,     6,
-      47,    12,    15,    16,    23,    22,     0,     9,    24,    20,
-      14,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    49,    50,    51,    52,     0,    53,    54,     0,    55
+      26,     8,    17,     3,    27,    65,    66,    67,    68,    69,
+      70,    71,    72,    73,    74,    75,    76,    49,    50,    51,
+      52,    53,    54,    55,    56,    57,    58,    59,    60,    23,
+       9,    87,    88,    77,    34,    35,    36,    37,    38,    39,
+      24,     1,    10,     4,    28,    18,     6,    15,    16,    30,
+      20,    21,    33,    32,    40,    41,    42,    43,    44,    45,
+      46,    47,    64,    79,    62,    80,    48,    81,    82,     0,
+      83,    84,    85,     0,    86,    89,     0,    90
 };
 
 static const yytype_int8 yycheck[] =
 {
-       1,     4,     1,     3,     5,    16,    17,    18,    19,    20,
-      21,    22,    23,    24,    25,    27,    28,    26,     0,    29,
-      31,    26,    30,    30,    26,    31,    -1,    30,    32,    30,
-      29,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    27,    27,    27,    27,    -1,    27,    27,    -1,    28
+       1,     4,     1,    30,     5,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,     6,     7,     8,
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    34,
+      33,    31,    32,    46,    36,    37,    38,    39,    40,    41,
+      45,     3,    45,     0,    45,    44,    44,    30,    44,    30,
+      45,    45,    30,    46,    44,    47,    31,    31,    31,    31,
+      31,    31,    46,    45,    32,    31,    35,    31,    31,    -1,
+      31,    31,    31,    -1,    32,    30,    -1,    31
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    34,    26,     0,    35,    29,    36,     4,    30,
-      37,    38,    26,     1,    29,    30,    30,    39,     1,     5,
-      30,    40,    31,    26,    32,     6,     7,     8,     9,    10,
-      11,    12,    13,    14,    15,    41,    42,    16,    17,    18,
-      19,    20,    21,    22,    23,    24,    25,    31,    43,    27,
-      27,    27,    27,    27,    27,    28,    27,    28
+       0,     3,    49,    30,     0,    50,    44,    51,     4,    33,
+      45,    52,    53,    54,    60,    30,    44,     1,    44,    61,
+      45,    45,    55,    34,    45,    62,     1,     5,    45,    56,
+      30,    63,    46,    30,    36,    37,    38,    39,    40,    41,
+      44,    47,    31,    31,    31,    31,    31,    31,    35,     6,
+       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+      17,    57,    32,    58,    46,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    46,    59,    45,
+      31,    31,    31,    31,    31,    31,    32,    31,    32,    30,
+      31
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    33,    35,    34,    36,    36,    37,    37,    37,    38,
-      39,    39,    39,    40,    41,    41,    41,    41,    41,    41,
-      41,    41,    41,    41,    42,    42,    43,    43,    43,    43,
-      43,    43,    43,    43,    43,    43,    43
+       0,    48,    50,    49,    51,    51,    52,    52,    53,    53,
+      53,    54,    55,    55,    55,    56,    57,    57,    57,    57,
+      57,    57,    57,    57,    57,    57,    57,    57,    58,    58,
+      59,    59,    59,    59,    59,    59,    59,    59,    59,    59,
+      59,    59,    59,    60,    61,    61,    62,    63,    63,    63,
+      63,    63,    63
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     6,     0,     2,     4,     3,     3,     2,
-       0,     2,     3,     6,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     0,     2,     1,     1,     2,     2,
-       2,     2,     2,     2,     2,     2,     2
+       0,     2,     0,     6,     0,     2,     1,     1,     4,     3,
+       3,     2,     0,     2,     3,     6,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     0,     2,
+       1,     1,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     4,     0,     2,     7,     3,     3,     3,
+       3,     3,     3
 };
 
 
@@ -1629,7 +1613,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 184 "parser.y"
+#line 199 "src/parser.y"
     {
         current_form = create_form((yyvsp[0].str));
         if (!current_form) {
@@ -1637,47 +1621,47 @@ yyreduce:
             YYERROR;
         }
     }
-#line 1641 "parser.tab.c"
+#line 1625 "src/parser.tab.c"
     break;
 
-  case 3: /* form: FORM IDENTIFIER $@1 '{' section_list '}'  */
-#line 192 "parser.y"
+  case 3: /* form: FORM IDENTIFIER $@1 '{' form_body '}'  */
+#line 207 "src/parser.y"
     {
         generate_html(stdout);
         (yyval.form) = current_form;
     }
-#line 1650 "parser.tab.c"
+#line 1634 "src/parser.tab.c"
     break;
 
-  case 6: /* section: section_header '{' field_list '}'  */
-#line 203 "parser.y"
+  case 8: /* section: section_header '{' field_list '}'  */
+#line 227 "src/parser.y"
     {
         current_section = NULL;
     }
-#line 1658 "parser.tab.c"
+#line 1642 "src/parser.tab.c"
     break;
 
-  case 7: /* section: section_header '{' '}'  */
-#line 207 "parser.y"
+  case 9: /* section: section_header '{' '}'  */
+#line 231 "src/parser.y"
     {
         current_section = NULL;
     }
-#line 1666 "parser.tab.c"
+#line 1650 "src/parser.tab.c"
     break;
 
-  case 8: /* section: section_header error '}'  */
-#line 211 "parser.y"
+  case 10: /* section: section_header error '}'  */
+#line 235 "src/parser.y"
     {
         yyerror("Invalid section declaration");
         current_section = NULL;
         yyclearin;
         yyerrok;
     }
-#line 1677 "parser.tab.c"
+#line 1661 "src/parser.tab.c"
     break;
 
-  case 9: /* section_header: SECTION IDENTIFIER  */
-#line 220 "parser.y"
+  case 11: /* section_header: SECTION IDENTIFIER  */
+#line 244 "src/parser.y"
     {
         if (current_section != NULL) {
             yyerror("Nested sections are not allowed");
@@ -1690,21 +1674,21 @@ yyreduce:
         }
         add_section_to_form(current_form, current_section);
     }
-#line 1694 "parser.tab.c"
+#line 1678 "src/parser.tab.c"
     break;
 
-  case 12: /* field_list: field_list error ';'  */
-#line 237 "parser.y"
+  case 14: /* field_list: field_list error ';'  */
+#line 261 "src/parser.y"
     {
         yyerror("Invalid field declaration");
         yyclearin;
         yyerrok;
     }
-#line 1704 "parser.tab.c"
+#line 1688 "src/parser.tab.c"
     break;
 
-  case 13: /* field: FIELD IDENTIFIER ':' field_type field_attributes ';'  */
-#line 245 "parser.y"
+  case 15: /* field: FIELD IDENTIFIER ':' field_type field_attributes ';'  */
+#line 269 "src/parser.y"
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
@@ -1717,79 +1701,91 @@ yyreduce:
         add_field_to_section(current_section, (yyvsp[-4].str), (yyvsp[-2].field_type), &(yyvsp[-1].field_attrs));
         free((yyvsp[-4].str)); // Free the field name
     }
-#line 1721 "parser.tab.c"
+#line 1705 "src/parser.tab.c"
     break;
 
-  case 14: /* field_type: TEXT  */
-#line 259 "parser.y"
+  case 16: /* field_type: TEXT  */
+#line 283 "src/parser.y"
                      { (yyval.field_type) = FIELD_TEXT; }
-#line 1727 "parser.tab.c"
+#line 1711 "src/parser.tab.c"
     break;
 
-  case 15: /* field_type: EMAIL  */
-#line 260 "parser.y"
+  case 17: /* field_type: EMAIL  */
+#line 284 "src/parser.y"
                      { (yyval.field_type) = FIELD_EMAIL; }
-#line 1733 "parser.tab.c"
+#line 1717 "src/parser.tab.c"
     break;
 
-  case 16: /* field_type: PASSWORD  */
-#line 261 "parser.y"
+  case 18: /* field_type: PASSWORD  */
+#line 285 "src/parser.y"
                      { (yyval.field_type) = FIELD_PASSWORD; }
-#line 1739 "parser.tab.c"
+#line 1723 "src/parser.tab.c"
     break;
 
-  case 17: /* field_type: NUMBER  */
-#line 262 "parser.y"
+  case 19: /* field_type: NUMBER  */
+#line 286 "src/parser.y"
                      { (yyval.field_type) = FIELD_NUMBER; }
-#line 1745 "parser.tab.c"
+#line 1729 "src/parser.tab.c"
     break;
 
-  case 18: /* field_type: TEXTAREA  */
-#line 263 "parser.y"
+  case 20: /* field_type: TEXTAREA  */
+#line 287 "src/parser.y"
                      { (yyval.field_type) = FIELD_TEXTAREA; }
-#line 1751 "parser.tab.c"
+#line 1735 "src/parser.tab.c"
     break;
 
-  case 19: /* field_type: DATE  */
-#line 264 "parser.y"
+  case 21: /* field_type: DATE  */
+#line 288 "src/parser.y"
                      { (yyval.field_type) = FIELD_DATE; }
-#line 1757 "parser.tab.c"
+#line 1741 "src/parser.tab.c"
     break;
 
-  case 20: /* field_type: CHECKBOX  */
-#line 265 "parser.y"
+  case 22: /* field_type: CHECKBOX  */
+#line 289 "src/parser.y"
                      { (yyval.field_type) = FIELD_CHECKBOX; }
-#line 1763 "parser.tab.c"
+#line 1747 "src/parser.tab.c"
     break;
 
-  case 21: /* field_type: DROPDOWN  */
-#line 266 "parser.y"
+  case 23: /* field_type: DROPDOWN  */
+#line 290 "src/parser.y"
                      { (yyval.field_type) = FIELD_DROPDOWN; }
-#line 1769 "parser.tab.c"
+#line 1753 "src/parser.tab.c"
     break;
 
-  case 22: /* field_type: RADIO  */
-#line 267 "parser.y"
+  case 24: /* field_type: RADIO  */
+#line 291 "src/parser.y"
                      { (yyval.field_type) = FIELD_RADIO; }
-#line 1775 "parser.tab.c"
+#line 1759 "src/parser.tab.c"
     break;
 
-  case 23: /* field_type: FILE_TYPE  */
-#line 268 "parser.y"
+  case 25: /* field_type: FILE_TYPE  */
+#line 292 "src/parser.y"
                       { (yyval.field_type) = FIELD_FILE; }
-#line 1781 "parser.tab.c"
+#line 1765 "src/parser.tab.c"
     break;
 
-  case 24: /* field_attributes: %empty  */
-#line 272 "parser.y"
+  case 26: /* field_type: USERNAME  */
+#line 293 "src/parser.y"
+                     { (yyval.field_type) = FIELD_USERNAME; }
+#line 1771 "src/parser.tab.c"
+    break;
+
+  case 27: /* field_type: ADDRESS  */
+#line 294 "src/parser.y"
+                     { (yyval.field_type) = FIELD_ADDRESS; }
+#line 1777 "src/parser.tab.c"
+    break;
+
+  case 28: /* field_attributes: %empty  */
+#line 298 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
     }
-#line 1789 "parser.tab.c"
+#line 1785 "src/parser.tab.c"
     break;
 
-  case 25: /* field_attributes: field_attributes attribute  */
-#line 276 "parser.y"
+  case 29: /* field_attributes: field_attributes attribute  */
+#line 302 "src/parser.y"
     {
         // Merge attributes
         if ((yyvsp[0].field_attrs).required != -1) (yyval.field_attrs).required = (yyvsp[0].field_attrs).required;
@@ -1808,112 +1804,202 @@ yyreduce:
             (yyval.field_attrs).default_value = (yyvsp[0].field_attrs).default_value;
         }
     }
-#line 1812 "parser.tab.c"
+#line 1808 "src/parser.tab.c"
     break;
 
-  case 26: /* attribute: REQUIRED  */
-#line 297 "parser.y"
+  case 30: /* attribute: REQUIRED  */
+#line 323 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).required = 1;
     }
-#line 1821 "parser.tab.c"
+#line 1817 "src/parser.tab.c"
     break;
 
-  case 27: /* attribute: OPTIONAL  */
-#line 302 "parser.y"
+  case 31: /* attribute: OPTIONAL  */
+#line 328 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).required = 0;
     }
-#line 1830 "parser.tab.c"
+#line 1826 "src/parser.tab.c"
     break;
 
-  case 28: /* attribute: PATTERN STRING_LITERAL  */
-#line 307 "parser.y"
+  case 32: /* attribute: PATTERN STRING_LITERAL  */
+#line 333 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).pattern = (yyvsp[0].str);
     }
-#line 1839 "parser.tab.c"
+#line 1835 "src/parser.tab.c"
     break;
 
-  case 29: /* attribute: DEFAULT STRING_LITERAL  */
-#line 312 "parser.y"
+  case 33: /* attribute: DEFAULT STRING_LITERAL  */
+#line 338 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).default_value = (yyvsp[0].str);
     }
-#line 1848 "parser.tab.c"
+#line 1844 "src/parser.tab.c"
     break;
 
-  case 30: /* attribute: DEFAULT NUMBER_LITERAL  */
-#line 317 "parser.y"
+  case 34: /* attribute: DEFAULT NUMBER_LITERAL  */
+#line 343 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         char buf[32];
         sprintf(buf, "%d", (yyvsp[0].num));
         (yyval.field_attrs).default_value = strdup(buf);
     }
-#line 1859 "parser.tab.c"
+#line 1855 "src/parser.tab.c"
     break;
 
-  case 31: /* attribute: MINLENGTH NUMBER_LITERAL  */
-#line 324 "parser.y"
+  case 35: /* attribute: MINLENGTH NUMBER_LITERAL  */
+#line 350 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).min_length = (yyvsp[0].num);
     }
-#line 1868 "parser.tab.c"
+#line 1864 "src/parser.tab.c"
     break;
 
-  case 32: /* attribute: MAXLENGTH NUMBER_LITERAL  */
-#line 329 "parser.y"
+  case 36: /* attribute: MAXLENGTH NUMBER_LITERAL  */
+#line 355 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).max_length = (yyvsp[0].num);
     }
-#line 1877 "parser.tab.c"
+#line 1873 "src/parser.tab.c"
     break;
 
-  case 33: /* attribute: MIN NUMBER_LITERAL  */
-#line 334 "parser.y"
+  case 37: /* attribute: MIN NUMBER_LITERAL  */
+#line 360 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).min_value = (yyvsp[0].num);
     }
-#line 1886 "parser.tab.c"
+#line 1882 "src/parser.tab.c"
     break;
 
-  case 34: /* attribute: MAX NUMBER_LITERAL  */
-#line 339 "parser.y"
+  case 38: /* attribute: MAX NUMBER_LITERAL  */
+#line 365 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).max_value = (yyvsp[0].num);
     }
-#line 1895 "parser.tab.c"
+#line 1891 "src/parser.tab.c"
     break;
 
-  case 35: /* attribute: ROWS NUMBER_LITERAL  */
-#line 344 "parser.y"
+  case 39: /* attribute: ROWS NUMBER_LITERAL  */
+#line 370 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).rows = (yyvsp[0].num);
     }
-#line 1904 "parser.tab.c"
+#line 1900 "src/parser.tab.c"
     break;
 
-  case 36: /* attribute: COLS NUMBER_LITERAL  */
-#line 349 "parser.y"
+  case 40: /* attribute: COLS NUMBER_LITERAL  */
+#line 375 "src/parser.y"
     {
         init_field_attributes(&(yyval.field_attrs));
         (yyval.field_attrs).cols = (yyvsp[0].num);
     }
-#line 1913 "parser.tab.c"
+#line 1909 "src/parser.tab.c"
+    break;
+
+  case 41: /* attribute: CONFIRM IDENTIFIER  */
+#line 380 "src/parser.y"
+    {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).confirm_field = (yyvsp[0].str);
+    }
+#line 1918 "src/parser.tab.c"
+    break;
+
+  case 42: /* attribute: STRENGTH NUMBER_LITERAL  */
+#line 385 "src/parser.y"
+    {
+        init_field_attributes(&(yyval.field_attrs));
+        (yyval.field_attrs).strength_required = (yyvsp[0].num);
+    }
+#line 1927 "src/parser.tab.c"
+    break;
+
+  case 46: /* validation_rule: IF condition '{' ERROR STRING_LITERAL ';' '}'  */
+#line 403 "src/parser.y"
+    {
+        ValidationRule* rule = malloc(sizeof(ValidationRule));
+        rule->condition = (yyvsp[-5].validation_rule);
+        rule->error_message = (yyvsp[-2].str);
+        rule->next = current_form->validation_rules;
+        current_form->validation_rules = rule;
+    }
+#line 1939 "src/parser.tab.c"
+    break;
+
+  case 47: /* condition: IDENTIFIER LT NUMBER_LITERAL  */
+#line 413 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s < %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1949 "src/parser.tab.c"
+    break;
+
+  case 48: /* condition: IDENTIFIER GT NUMBER_LITERAL  */
+#line 419 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s > %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1959 "src/parser.tab.c"
+    break;
+
+  case 49: /* condition: IDENTIFIER LTE NUMBER_LITERAL  */
+#line 425 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s <= %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1969 "src/parser.tab.c"
+    break;
+
+  case 50: /* condition: IDENTIFIER GTE NUMBER_LITERAL  */
+#line 431 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s >= %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1979 "src/parser.tab.c"
+    break;
+
+  case 51: /* condition: IDENTIFIER EQ NUMBER_LITERAL  */
+#line 437 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s == %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1989 "src/parser.tab.c"
+    break;
+
+  case 52: /* condition: IDENTIFIER NEQ NUMBER_LITERAL  */
+#line 443 "src/parser.y"
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s != %d", (yyvsp[-2].str), (yyvsp[0].num));
+        (yyval.validation_rule) = cond;
+    }
+#line 1999 "src/parser.tab.c"
     break;
 
 
-#line 1917 "parser.tab.c"
+#line 2003 "src/parser.tab.c"
 
       default: break;
     }
@@ -2137,7 +2223,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 355 "parser.y"
+#line 450 "src/parser.y"
 
 
 void yyerror(const char *s) {
