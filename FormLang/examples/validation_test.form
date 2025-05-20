@@ -1,0 +1,53 @@
+form ValidationTest {
+    section PatternTests {
+        field empty_pattern: text pattern ".*" required;
+        field complex_pattern: text pattern "^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/? ]+$" required;
+        field email_pattern: text pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required;
+        field url_pattern: text pattern "^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$" required;
+    }
+
+    section RequiredTests {
+        field required_no_validation: text required;
+        field required_with_pattern: text pattern ".*" required;
+        field required_with_length: text minLength 1 maxLength 10 required;
+        field required_with_default: text default "test" required;
+    }
+
+    section DropdownTests {
+        field required_dropdown: dropdown required;
+        field optional_dropdown: dropdown optional;
+        field dropdown_with_default: dropdown default "option1" required;
+    }
+
+    section RadioTests {
+        field required_radio: radio required;
+        field optional_radio: radio optional;
+        field radio_with_default: radio default "option1" required;
+    }
+
+    section FileTests {
+        field required_file: file required;
+        field optional_file: file optional;
+        field file_with_accept: file accept "image/*" required;
+    }
+
+    section NumberTests {
+        field zero_range: number required;
+        field negative_range: number min -10 max -1 required;
+        field positive_range: number min 1 max 10 required;
+        field decimal_range: number min 0.1 max 1.0 required;
+    }
+
+    section DefaultValueTests {
+        field empty_default: text default "" required;
+        field space_default: text default " " required;
+        field special_chars: text default "!@#$%^&*()" required;
+        field unicode_default: text default "测试" required;
+        field zero_default: number default "0" required;
+    }
+
+    section MixedAttributes {
+        field complex_field: text pattern "^[A-Za-z]+$" minLength 1 maxLength 100 default "test" required;
+        field all_optional: text pattern ".*" maxLength 1000 default "" optional;
+    }
+} 

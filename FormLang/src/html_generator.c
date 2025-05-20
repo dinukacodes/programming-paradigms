@@ -14,6 +14,8 @@ void generate_html_header(FILE* output) {
     fprintf(output, "input, textarea, select { width: 100%%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }\n");
     fprintf(output, "input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }\n");
     fprintf(output, "input[type=submit]:hover { background: #45a049; }\n");
+    fprintf(output, ".radio-group { margin-bottom: 10px; }\n");
+    fprintf(output, ".radio-group label { display: inline; margin-left: 5px; }\n");
     fprintf(output, "</style>\n</head>\n<body>\n");
 }
 
@@ -21,10 +23,34 @@ void generate_html_footer(FILE* output) {
     fprintf(output, "</body>\n</html>\n");
 }
 
+char* escape_html_attr(const char* input) {
+    if (!input) return strdup("");
+    
+    char* output = malloc(strlen(input) * 2 + 1);
+    int j = 0;
+    
+    for (int i = 0; input[i] != '\0'; i++) {
+        switch (input[i]) {
+            case '&': strcpy(output + j, "&amp;"); j += 5; break;
+            case '"': strcpy(output + j, "&quot;"); j += 6; break;
+            case '<': strcpy(output + j, "&lt;"); j += 4; break;
+            case '>': strcpy(output + j, "&gt;"); j += 4; break;
+            default: output[j++] = input[i];
+        }
+    }
+    output[j] = '\0';
+    return output;
+}
+
 void generate_section_html(FILE* output, Section* section) {
     fprintf(stderr, "Starting section generation\n");
     if (!section || !output) {
         fprintf(stderr, "Null section or output\n");
+        return;
+    }
+
+    // Skip empty sections
+    if (section->field_count == 0) {
         return;
     }
 
@@ -35,8 +61,12 @@ void generate_section_html(FILE* output, Section* section) {
     for (int i = 0; i < section->field_count; i++) {
         fprintf(stderr, "Generating field %d\n", i);
         Field* field = &section->fields[i];
+        
+        // Generate label
+        char* escaped_name = escape_html_attr(field->name);
         fprintf(output, "<label for=\"%s\">%s%s</label>\n", 
-               field->name, field->name, field->attributes.required ? " *" : "");
+               escaped_name, escaped_name, field->attributes.required ? " *" : "");
+        free(escaped_name);
 
         const char* type = "text";
         switch (field->type) {
@@ -62,7 +92,9 @@ void generate_section_html(FILE* output, Section* section) {
             fprintf(output, "<select id=\"%s\" name=\"%s\"", field->name, field->name);
             if (field->attributes.required) fprintf(output, " required");
             fprintf(output, ">\n");
-            fprintf(output, "  <option value=\"\">Select an option</option>\n");
+            if (!field->attributes.required) {
+                fprintf(output, "  <option value=\"\">Select an option</option>\n");
+            }
             fprintf(output, "  <option value=\"option1\">Option 1</option>\n");
             fprintf(output, "  <option value=\"option2\">Option 2</option>\n");
             fprintf(output, "</select>\n");
@@ -71,21 +103,62 @@ void generate_section_html(FILE* output, Section* section) {
             fprintf(output, "  <input type=\"radio\" id=\"%s_1\" name=\"%s\" value=\"option1\"", field->name, field->name);
             if (field->attributes.required) fprintf(output, " required");
             fprintf(output, ">\n");
-            fprintf(output, "  <label for=\"%s_1\">Option 1</label><br>\n", field->name);
+            fprintf(output, "  <span>Option 1</span><br>\n");
             fprintf(output, "  <input type=\"radio\" id=\"%s_2\" name=\"%s\" value=\"option2\"", field->name, field->name);
             if (field->attributes.required) fprintf(output, " required");
             fprintf(output, ">\n");
-            fprintf(output, "  <label for=\"%s_2\">Option 2</label>\n", field->name);
+            fprintf(output, "  <span>Option 2</span>\n");
             fprintf(output, "</div>\n");
         } else {
             fprintf(output, "<input type=\"%s\" id=\"%s\" name=\"%s\"", type, field->name, field->name);
-            if (field->attributes.required) fprintf(output, " required");
-            if (field->attributes.min_length > 0) fprintf(output, " minlength=\"%d\"", field->attributes.min_length);
-            if (field->attributes.max_length > 0) fprintf(output, " maxlength=\"%d\"", field->attributes.max_length);
-            if (field->attributes.min_value > 0) fprintf(output, " min=\"%d\"", field->attributes.min_value);
-            if (field->attributes.max_value > 0) fprintf(output, " max=\"%d\"", field->attributes.max_value);
-            if (field->attributes.pattern) fprintf(output, " pattern=\"%s\"", field->attributes.pattern);
-            if (field->attributes.default_value) fprintf(output, " value=\"%s\"", field->attributes.default_value);
+            
+            // Handle required attribute
+            if (field->attributes.required) {
+                fprintf(output, " required");
+            }
+            
+            // Handle length constraints
+            if (field->attributes.min_length > 0) {
+                fprintf(output, " minlength=\"%d\"", field->attributes.min_length);
+            }
+            if (field->attributes.max_length > 0) {
+                fprintf(output, " maxlength=\"%d\"", field->attributes.max_length);
+            }
+            
+            // Handle number constraints
+            if (field->type == FIELD_NUMBER) {
+                if (field->attributes.min_value != 0) {
+                    fprintf(output, " min=\"%d\"", field->attributes.min_value);
+                }
+                if (field->attributes.max_value != 0) {
+                    fprintf(output, " max=\"%d\"", field->attributes.max_value);
+                }
+            }
+            
+            // Handle pattern
+            if (field->attributes.pattern && strlen(field->attributes.pattern) > 0) {
+                char* escaped_pattern = escape_html_attr(field->attributes.pattern);
+                fprintf(output, " pattern=\"%s\"", escaped_pattern);
+                free(escaped_pattern);
+            }
+            
+            // Handle default value
+            if (field->attributes.default_value) {
+                char* escaped_value = escape_html_attr(field->attributes.default_value);
+                fprintf(output, " value=\"%s\"", escaped_value);
+                free(escaped_value);
+            }
+            
+            // Handle file type
+            if (field->type == FIELD_FILE) {
+                fprintf(output, " accept=\"*/*\"");
+            }
+            
+            // Handle checkbox
+            if (field->type == FIELD_CHECKBOX && field->attributes.default_value) {
+                fprintf(output, " checked");
+            }
+            
             fprintf(output, ">\n");
         }
         fprintf(stderr, "Field %d generated successfully\n", i);

@@ -10,6 +10,8 @@ label { display: block; margin-bottom: 5px; }
 input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
 input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
 input[type=submit]:hover { background: #45a049; }
+.radio-group { margin-bottom: 10px; }
+.radio-group label { display: inline; margin-left: 5px; }
 </style>
 </head>
 <body>
@@ -17,9 +19,9 @@ input[type=submit]:hover { background: #45a049; }
 <section>
 <h2>PatternEdgeCases</h2>
 <label for="empty_pattern">empty_pattern *</label>
-<input type="text" id="empty_pattern" name="empty_pattern" required pattern="">
+<input type="text" id="empty_pattern" name="empty_pattern" required>
 <label for="complex_pattern">complex_pattern *</label>
-<input type="text" id="complex_pattern" name="complex_pattern" required pattern="^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]+$">
+<input type="text" id="complex_pattern" name="complex_pattern" required pattern="^[A-Za-z0-9!@#$%^&amp;*()_+\-=\[\]{};':&quot;\\|,.&lt;&gt;\/? ]+$">
 <label for="email_pattern">email_pattern *</label>
 <input type="text" id="email_pattern" name="email_pattern" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
 <label for="url_pattern">url_pattern *</label>
@@ -50,11 +52,11 @@ input[type=submit]:hover { background: #45a049; }
 <label for="space_default">space_default *</label>
 <input type="text" id="space_default" name="space_default" required value=" ">
 <label for="special_chars_default">special_chars_default *</label>
-<input type="text" id="special_chars_default" name="special_chars_default" required value="!@#$%^&*()">
+<input type="text" id="special_chars_default" name="special_chars_default" required value="!@#$%^&amp;*()">
 <label for="unicode_default">unicode_default *</label>
 <input type="text" id="unicode_default" name="unicode_default" required value="测试">
 <label for="zero_default">zero_default *</label>
-<input type="number" id="zero_default" name="zero_default" required value="0">
+<input type="number" id="zero_default" name="zero_default" required min="-1" max="-1" value="0">
 </section>
 <section>
 <h2>MixedAttributes</h2>
