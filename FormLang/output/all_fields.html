@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+form { background: #f5f5f5; padding: 20px; border-radius: 5px; }
+section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }
+h2 { color: #333; margin-top: 0; }
+label { display: block; margin-bottom: 5px; }
+input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
+input[type=submit]:hover { background: #45a049; }
+</style>
+</head>
+<body>
+<form>
+<section>
+<h2>FieldTypes</h2>
+<label for="text_field">text_field *</label>
+<input type="text" id="text_field" name="text_field" required minlength="3" maxlength="50" pattern="^[A-Za-z ]+$">
+<label for="email_field">email_field *</label>
+<input type="email" id="email_field" name="email_field" required>
+<label for="password_field">password_field *</label>
+<input type="password" id="password_field" name="password_field" required minlength="8">
+<label for="number_field">number_field</label>
+<input type="number" id="number_field" name="number_field" max="100" value="50">
+<label for="textarea_field">textarea_field *</label>
+<textarea id="textarea_field" name="textarea_field" rows="10" cols="50" required></textarea>
+<label for="date_field">date_field *</label>
+<input type="date" id="date_field" name="date_field" required>
+<label for="checkbox_field">checkbox_field</label>
+<input type="checkbox" id="checkbox_field" name="checkbox_field" value="1">
+<label for="radio_field">radio_field *</label>
+<div class="radio-group">
+  <input type="radio" id="radio_field_1" name="radio_field" value="option1" required>
+  <label for="radio_field_1">Option 1</label><br>
+  <input type="radio" id="radio_field_2" name="radio_field" value="option2" required>
+  <label for="radio_field_2">Option 2</label>
+</div>
+<label for="dropdown_field">dropdown_field *</label>
+<select id="dropdown_field" name="dropdown_field" required>
+  <option value="">Select an option</option>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+</select>
+<label for="file_field">file_field</label>
+<input type="file" id="file_field" name="file_field">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>

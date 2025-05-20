@@ -39,7 +39,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -69,18 +69,17 @@ extern int yydebug;
     FILE_TYPE = 270,               /* FILE_TYPE  */
     REQUIRED = 271,                /* REQUIRED  */
     OPTIONAL = 272,                /* OPTIONAL  */
-    MIN_LENGTH = 273,              /* MIN_LENGTH  */
-    MAX_LENGTH = 274,              /* MAX_LENGTH  */
+    MINLENGTH = 273,               /* MINLENGTH  */
+    MAXLENGTH = 274,               /* MAXLENGTH  */
     MIN = 275,                     /* MIN  */
     MAX = 276,                     /* MAX  */
     ROWS = 277,                    /* ROWS  */
     COLS = 278,                    /* COLS  */
     PATTERN = 279,                 /* PATTERN  */
     DEFAULT = 280,                 /* DEFAULT  */
-    OPTIONS = 281,                 /* OPTIONS  */
-    IDENTIFIER = 282,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 283,          /* NUMBER_LITERAL  */
-    STRING_LITERAL = 284           /* STRING_LITERAL  */
+    IDENTIFIER = 281,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 282,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 283           /* STRING_LITERAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,35 +103,32 @@ extern int yydebug;
 #define FILE_TYPE 270
 #define REQUIRED 271
 #define OPTIONAL 272
-#define MIN_LENGTH 273
-#define MAX_LENGTH 274
+#define MINLENGTH 273
+#define MAXLENGTH 274
 #define MIN 275
 #define MAX 276
 #define ROWS 277
 #define COLS 278
 #define PATTERN 279
 #define DEFAULT 280
-#define OPTIONS 281
-#define IDENTIFIER 282
-#define NUMBER_LITERAL 283
-#define STRING_LITERAL 284
+#define IDENTIFIER 281
+#define NUMBER_LITERAL 282
+#define STRING_LITERAL 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 89 "parser.y"
+#line 164 "parser.y"
 
-    char *str;
-    int required;
+    char* str;
+    int num;
+    Form* form;
+    Section* section;
     FieldType field_type;
     FieldAttributes field_attrs;
-    struct {
-        char** options;
-        int count;
-    } option_list;
 
-#line 136 "y.tab.h"
+#line 132 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

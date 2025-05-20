@@ -1,19 +1,27 @@
 form ComplexForm {
     section PersonalInfo {
-        field fullName: text required;
+        field full_name: text minLength 5 maxLength 100 pattern "^[A-Za-z ]+$" required;
+        field birth_date: date required;
+        field age: number min 18 max 120 required;
+        field gender: radio required;
+    }
+
+    section ContactInfo {
         field email: email required;
-        field phone: number optional;
-        field age: number required;
+        field phone: text pattern "^[0-9]{10}$" required;
+        field address: textarea rows 3 cols 50 required;
     }
-    
-    section Security {
-        field username: text required;
-        field password: password required;
-        field confirmPassword: password required;
+
+    section AccountInfo {
+        field username: text minLength 5 maxLength 20 pattern "^[a-zA-Z0-9_]+$" required;
+        field password: password minLength 8 required;
+        field confirm_password: password minLength 8 required;
     }
-    
+
     section Preferences {
-        field theme: text optional;
-        field notifications: text optional;
+        field newsletter: checkbox default 1;
+        field theme: dropdown required;
+        field bio: textarea rows 5 cols 40 optional;
+        field avatar: file optional;
     }
 } 

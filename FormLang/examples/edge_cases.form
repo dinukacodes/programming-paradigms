@@ -27,4 +27,32 @@ form EdgeCases {
     field test2: email optional;
     field test3: password optional;
   }
+
+  section SpecialFields {
+    field empty_field: text optional;
+    field long_field_name_with_special_chars_and_numbers_123: text optional;
+    field field_with_underscores_and_hyphens: text optional;
+    field field_with_unicode_测试: text optional;
+  }
+
+  section ValidationTests {
+    field min_length_test: text minLength 1 required;
+    field max_length_test: text maxLength 5 required;
+    field pattern_test: text pattern "^[A-Za-z0-9!@#$%^&*()_+]+$" required;
+    field number_range: number min -100 max 100 default 0;
+    field date_range: date required;
+  }
+
+  section OptionalFields {
+    field optional_text: text optional;
+    field optional_email: email optional;
+    field optional_number: number optional;
+    field optional_checkbox: checkbox optional;
+  }
+
+  section DefaultValues {
+    field text_default: text default "Hello World" optional;
+    field number_default: number default 42 optional;
+    field checkbox_default: checkbox default 1 optional;
+  }
 } 

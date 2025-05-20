@@ -61,10 +61,25 @@ extern int yydebug;
     EMAIL = 262,                   /* EMAIL  */
     PASSWORD = 263,                /* PASSWORD  */
     NUMBER = 264,                  /* NUMBER  */
-    REQUIRED = 265,                /* REQUIRED  */
-    OPTIONAL = 266,                /* OPTIONAL  */
-    IDENTIFIER = 267,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 268           /* NUMBER_LITERAL  */
+    TEXTAREA = 265,                /* TEXTAREA  */
+    DATE = 266,                    /* DATE  */
+    CHECKBOX = 267,                /* CHECKBOX  */
+    DROPDOWN = 268,                /* DROPDOWN  */
+    RADIO = 269,                   /* RADIO  */
+    FILE_TYPE = 270,               /* FILE_TYPE  */
+    REQUIRED = 271,                /* REQUIRED  */
+    OPTIONAL = 272,                /* OPTIONAL  */
+    MINLENGTH = 273,               /* MINLENGTH  */
+    MAXLENGTH = 274,               /* MAXLENGTH  */
+    MIN = 275,                     /* MIN  */
+    MAX = 276,                     /* MAX  */
+    ROWS = 277,                    /* ROWS  */
+    COLS = 278,                    /* COLS  */
+    PATTERN = 279,                 /* PATTERN  */
+    DEFAULT = 280,                 /* DEFAULT  */
+    IDENTIFIER = 281,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 282,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 283           /* STRING_LITERAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -73,15 +88,16 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 151 "src/parser.y"
+#line 162 "src/parser.y"
 
     char* str;
     int num;
     Form* form;
     Section* section;
     FieldType field_type;
+    FieldAttributes field_attrs;
 
-#line 85 "src/parser.tab.h"
+#line 101 "src/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

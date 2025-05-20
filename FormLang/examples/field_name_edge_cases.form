@@ -1,0 +1,35 @@
+form FieldNameEdgeCases {
+    section SpecialCharacters {
+        field field_with_dots: text required;
+        field field_with_at_symbol: text required;
+        field field_with_dollar: text required;
+        field field_with_hash: text required;
+        field field_with_percent: text required;
+        field field_with_ampersand: text required;
+        field field_with_star: text required;
+        field field_with_plus: text required;
+        field field_with_hyphen: text required;
+        field field_with_equals: text required;
+    }
+
+    section UnicodeNames {
+        field unicode_chinese: text required;
+        field unicode_japanese: text required;
+        field unicode_korean: text required;
+        field unicode_hindi: text required;
+        field unicode_arabic: text required;
+    }
+
+    section ReservedKeywords {
+        field form_field: text required;
+        field section_field: text required;
+        field field_field: text required;
+        field required_field: text required;
+        field optional_field: text required;
+    }
+
+    section LengthEdgeCases {
+        field a: text required;
+        field very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly: text required;
+    }
+} 

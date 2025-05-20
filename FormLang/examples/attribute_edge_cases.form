@@ -1,0 +1,35 @@
+form AttributeEdgeCases {
+    section PatternEdgeCases {
+        field empty_pattern: text pattern "" required;
+        field complex_pattern: text pattern "^[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/? ]+$" required;
+        field email_pattern: text pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" required;
+        field url_pattern: text pattern "^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$" required;
+    }
+
+    section LengthEdgeCases {
+        field zero_length: text minLength 0 maxLength 0 required;
+        field max_length: text minLength 1 maxLength 1000 required;
+        field min_length: text minLength 1 maxLength 10 required;
+    }
+
+    section NumberEdgeCases {
+        field zero_range: number min 0 max 0 required;
+        field negative_range: number min -1000 max -1 required;
+        field large_range: number min 0 max 1000000 required;
+        field decimal_range: number min 0 max 1 required;
+    }
+
+    section DefaultValueEdgeCases {
+        field empty_default: text default "" required;
+        field space_default: text default " " required;
+        field special_chars_default: text default "!@#$%^&*()" required;
+        field unicode_default: text default "测试" required;
+        field zero_default: number default 0 required;
+        field negative_default: number default -1 required;
+    }
+
+    section MixedAttributes {
+        field complex_field: text minLength 1 maxLength 100 pattern "^[A-Za-z]+$" default "test" required;
+        field all_optional: text minLength 0 maxLength 1000 pattern ".*" default "" optional;
+    }
+} 

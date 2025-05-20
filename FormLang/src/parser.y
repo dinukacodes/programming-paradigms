@@ -24,6 +24,7 @@ int field_name_count = 0;
 // Helper functions
 Form* create_form(const char* name) {
     Form* form = malloc(sizeof(Form));
+    if (!form) return NULL;
     form->name = strdup(name);
     form->sections = NULL;
     form->section_count = 0;
@@ -32,6 +33,7 @@ Form* create_form(const char* name) {
 
 Section* create_section(const char* name) {
     Section* section = malloc(sizeof(Section));
+    if (!section) return NULL;
     section->name = strdup(name);
     section->fields = NULL;
     section->field_count = 0;
@@ -39,11 +41,19 @@ Section* create_section(const char* name) {
 }
 
 void add_section_to_form(Form* form, Section* section) {
-    if (!form || !section) return;
+    if (!form || !section) {
+        fprintf(stderr, "Null form or section\n");
+        return;
+    }
     
+    Section** new_sections = realloc(form->sections, (form->section_count + 1) * sizeof(Section*));
+    if (!new_sections) {
+        fprintf(stderr, "Memory allocation failed for sections\n");
+        exit(1);
+    }
+    form->sections = new_sections;
+    form->sections[form->section_count] = section;
     form->section_count++;
-    form->sections = realloc(form->sections, form->section_count * sizeof(Section*));
-    form->sections[form->section_count - 1] = section;
 }
 
 int check_duplicate_field(const char* name) {
@@ -55,67 +65,66 @@ int check_duplicate_field(const char* name) {
     return 0;
 }
 
-void add_field_to_section(Section* section, const char* name, FieldType type, int required) {
-    if (!section || !name) return;
+void init_field_attributes(FieldAttributes* attrs) {
+    if (!attrs) return;
+    attrs->min_length = -1;
+    attrs->max_length = -1;
+    attrs->min_value = -1;
+    attrs->max_value = -1;
+    attrs->rows = -1;
+    attrs->cols = -1;
+    attrs->pattern = NULL;
+    attrs->default_value = NULL;
+    attrs->required = 0;
+}
+
+void add_field_to_section(Section* section, const char* name, FieldType type, FieldAttributes* attrs) {
+    if (!section || !name || !attrs) {
+        fprintf(stderr, "Null section, name, or attrs\n");
+        return;
+    }
     
     // Add field name to tracking
     field_name_count++;
-    field_names = realloc(field_names, field_name_count * sizeof(FieldName));
+    FieldName* new_field_names = realloc(field_names, field_name_count * sizeof(FieldName));
+    if (!new_field_names) {
+        fprintf(stderr, "Memory allocation failed for field names\n");
+        exit(1);
+    }
+    field_names = new_field_names;
     field_names[field_name_count - 1].name = strdup(name);
     field_names[field_name_count - 1].line = yylineno;
     
-    section->field_count++;
-    section->fields = realloc(section->fields, section->field_count * sizeof(Field));
+    // Allocate memory for the new field
+    Field* new_fields = realloc(section->fields, (section->field_count + 1) * sizeof(Field));
+    if (!new_fields) {
+        fprintf(stderr, "Memory allocation failed for fields\n");
+        exit(1);
+    }
+    section->fields = new_fields;
     
-    Field* field = &section->fields[section->field_count - 1];
+    Field* field = &section->fields[section->field_count];
     field->name = strdup(name);
     field->type = type;
-    field->required = required;
-}
-
-void generate_html(FILE* output) {
-    if (!current_form || !output) return;
+    init_field_attributes(&field->attributes);
     
-    fprintf(output, "<!DOCTYPE html>\n<html>\n<head>\n");
-    fprintf(output, "<title>%s</title>\n", current_form->name);
-    fprintf(output, "<style>\n");
-    fprintf(output, "body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\n");
-    fprintf(output, "form { background: #f5f5f5; padding: 20px; border-radius: 5px; }\n");
-    fprintf(output, "section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }\n");
-    fprintf(output, "h2 { color: #333; margin-top: 0; }\n");
-    fprintf(output, "label { display: block; margin-bottom: 5px; }\n");
-    fprintf(output, "input { width: 100%%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }\n");
-    fprintf(output, "input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }\n");
-    fprintf(output, "input[type=submit]:hover { background: #45a049; }\n");
-    fprintf(output, "</style>\n</head>\n<body>\n");
-    fprintf(output, "<form>\n");
+    // Copy attributes
+    field->attributes.min_length = attrs->min_length;
+    field->attributes.max_length = attrs->max_length;
+    field->attributes.min_value = attrs->min_value;
+    field->attributes.max_value = attrs->max_value;
+    field->attributes.rows = attrs->rows;
+    field->attributes.cols = attrs->cols;
+    field->attributes.required = attrs->required;
     
-    for (int i = 0; i < current_form->section_count; i++) {
-        Section* section = current_form->sections[i];
-        fprintf(output, "<section>\n");
-        fprintf(output, "<h2>%s</h2>\n", section->name);
-        
-        for (int j = 0; j < section->field_count; j++) {
-            Field* field = &section->fields[j];
-            fprintf(output, "<label for=\"%s\">%s%s</label>\n", 
-                   field->name, field->name, field->required ? " *" : "");
-            
-            const char* type = "text";
-            switch (field->type) {
-                case FIELD_TEXT: type = "text"; break;
-                case FIELD_EMAIL: type = "email"; break;
-                case FIELD_PASSWORD: type = "password"; break;
-                case FIELD_NUMBER: type = "number"; break;
-            }
-            
-            fprintf(output, "<input type=\"%s\" id=\"%s\" name=\"%s\"%s>\n",
-                   type, field->name, field->name, field->required ? " required" : "");
-        }
-        fprintf(output, "</section>\n");
+    if (attrs->pattern) {
+        field->attributes.pattern = strdup(attrs->pattern);
+    }
+    if (attrs->default_value) {
+        field->attributes.default_value = strdup(attrs->default_value);
     }
     
-    fprintf(output, "<input type=\"submit\" value=\"Submit\">\n");
-    fprintf(output, "</form>\n</body>\n</html>\n");
+    section->field_count++;
 }
 
 void cleanup_form(Form* form) {
@@ -126,6 +135,8 @@ void cleanup_form(Form* form) {
                 for (int j = 0; j < s->field_count; j++) {
                     Field* f = &s->fields[j];
                     if (f->name) free(f->name);
+                    if (f->attributes.pattern) free(f->attributes.pattern);
+                    if (f->attributes.default_value) free(f->attributes.default_value);
                 }
                 if (s->fields) free(s->fields);
                 if (s->name) free(s->name);
@@ -146,7 +157,9 @@ void cleanup_form(Form* form) {
 }
 %}
 
-%token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER REQUIRED OPTIONAL IDENTIFIER NUMBER_LITERAL
+%token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER TEXTAREA DATE CHECKBOX DROPDOWN RADIO FILE_TYPE
+%token REQUIRED OPTIONAL MINLENGTH MAXLENGTH MIN MAX ROWS COLS PATTERN DEFAULT
+%token IDENTIFIER NUMBER_LITERAL STRING_LITERAL
 
 %union {
     char* str;
@@ -154,12 +167,14 @@ void cleanup_form(Form* form) {
     Form* form;
     Section* section;
     FieldType field_type;
+    FieldAttributes field_attrs;
 }
 
-%type <str> IDENTIFIER
+%type <str> IDENTIFIER STRING_LITERAL
+%type <num> NUMBER_LITERAL
 %type <form> form
 %type <field_type> field_type
-%type <num> field_attribute
+%type <field_attrs> field_attributes attribute
 
 %define parse.error verbose
 
@@ -226,7 +241,7 @@ field_list:
     }
     ;
 
-field: FIELD IDENTIFIER ':' field_type field_attribute ';'
+field: FIELD IDENTIFIER ':' field_type field_attributes ';'
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
@@ -236,50 +251,127 @@ field: FIELD IDENTIFIER ':' field_type field_attribute ';'
             yyerror("Duplicate field name found");
             YYERROR;
         }
-        add_field_to_section(current_section, $2, $4, $5);
-    }
-    | FIELD ':' field_type field_attribute ';'
-    {
-        yyerror("Missing field name");
-        YYERROR;
-    }
-    | FIELD IDENTIFIER ':' field_attribute ';'
-    {
-        yyerror("Missing field type");
-        YYERROR;
-    }
-    | FIELD IDENTIFIER ':' field_type error
-    {
-        yyerror("Invalid field attribute or missing semicolon");
-        YYERROR;
+        add_field_to_section(current_section, $2, $4, &$5);
+        free($2); // Free the field name
     }
     ;
 
-field_type: 
-    TEXT { $$ = FIELD_TEXT; }
-    | EMAIL { $$ = FIELD_EMAIL; }
-    | PASSWORD { $$ = FIELD_PASSWORD; }
-    | NUMBER { $$ = FIELD_NUMBER; }
-    | IDENTIFIER { 
-        yyerror("Invalid field type");
-        YYERROR;
+field_type: TEXT     { $$ = FIELD_TEXT; }
+          | EMAIL    { $$ = FIELD_EMAIL; }
+          | PASSWORD { $$ = FIELD_PASSWORD; }
+          | NUMBER   { $$ = FIELD_NUMBER; }
+          | TEXTAREA { $$ = FIELD_TEXTAREA; }
+          | DATE     { $$ = FIELD_DATE; }
+          | CHECKBOX { $$ = FIELD_CHECKBOX; }
+          | DROPDOWN { $$ = FIELD_DROPDOWN; }
+          | RADIO    { $$ = FIELD_RADIO; }
+          | FILE_TYPE { $$ = FIELD_FILE; }
+          ;
+
+field_attributes: /* empty */
+    {
+        init_field_attributes(&$$);
+    }
+    | field_attributes attribute
+    {
+        // Merge attributes
+        if ($2.required != -1) $$.required = $2.required;
+        if ($2.min_length != -1) $$.min_length = $2.min_length;
+        if ($2.max_length != -1) $$.max_length = $2.max_length;
+        if ($2.min_value != -1) $$.min_value = $2.min_value;
+        if ($2.max_value != -1) $$.max_value = $2.max_value;
+        if ($2.rows != -1) $$.rows = $2.rows;
+        if ($2.cols != -1) $$.cols = $2.cols;
+        if ($2.pattern) {
+            if ($$.pattern) free($$.pattern);
+            $$.pattern = $2.pattern;
+        }
+        if ($2.default_value) {
+            if ($$.default_value) free($$.default_value);
+            $$.default_value = $2.default_value;
+        }
     }
     ;
 
-field_attribute:
-    REQUIRED { $$ = 1; }
-    | OPTIONAL { $$ = 0; }
-    | { $$ = 0; }
+attribute: REQUIRED
+    {
+        init_field_attributes(&$$);
+        $$.required = 1;
+    }
+    | OPTIONAL
+    {
+        init_field_attributes(&$$);
+        $$.required = 0;
+    }
+    | PATTERN STRING_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.pattern = $2;
+    }
+    | DEFAULT STRING_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.default_value = $2;
+    }
+    | DEFAULT NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        char buf[32];
+        sprintf(buf, "%d", $2);
+        $$.default_value = strdup(buf);
+    }
+    | MINLENGTH NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.min_length = $2;
+    }
+    | MAXLENGTH NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.max_length = $2;
+    }
+    | MIN NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.min_value = $2;
+    }
+    | MAX NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.max_value = $2;
+    }
+    | ROWS NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.rows = $2;
+    }
+    | COLS NUMBER_LITERAL
+    {
+        init_field_attributes(&$$);
+        $$.cols = $2;
+    }
     ;
 
 %%
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
+    fprintf(stderr, "Parser Error: %s at line %d\n", s, yylineno);
 }
 
-int main() {
-    int result = yyparse();
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            perror(argv[1]);
+            return 1;
+        }
+        yyin = file;
+    }
+    yyparse();
     cleanup_form(current_form);
-    return result;
+    return 0;
+}
+
+int yywrap() {
+    return 1;
 }

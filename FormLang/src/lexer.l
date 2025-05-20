@@ -8,15 +8,36 @@
 extern YYSTYPE yylval;
 
 // Context tracking
-int after_field = 0;
 int after_colon = 0;
-int after_section = 0;
-int after_form = 0;
-int after_type = 0;
 
 // Error handling
 void syntax_error(const char* msg) {
     fprintf(stderr, "Syntax error at line %d: %s\n", yylineno, msg);
+}
+
+// String handling
+char* process_string(const char* input) {
+    char* output = malloc(strlen(input) + 1);
+    int i = 0, j = 0;
+    
+    while (input[i] != '\0') {
+        if (input[i] == '\\') {
+            i++;
+            switch (input[i]) {
+                case 'n': output[j++] = '\n'; break;
+                case 't': output[j++] = '\t'; break;
+                case 'r': output[j++] = '\r'; break;
+                case '\\': output[j++] = '\\'; break;
+                case '"': output[j++] = '"'; break;
+                default: output[j++] = input[i]; break;
+            }
+        } else {
+            output[j++] = input[i];
+        }
+        i++;
+    }
+    output[j] = '\0';
+    return output;
 }
 %}
 
@@ -29,131 +50,126 @@ void syntax_error(const char* msg) {
 
 [ \t\n]     ; /* Skip whitespace and newlines */
 
-"form"      { 
-    if (after_form) {
-        syntax_error("Nested form declarations are not allowed");
-        return -1;
-    }
-    after_form = 1;
-    after_section = 0;
-    return FORM;
-}
-"section"   { 
-    if (!after_form) {
-        syntax_error("Section must be inside a form");
-        return -1;
-    }
-    after_section = 1;
-    return SECTION;
-}
-"field"     { 
-    if (!after_section) {
-        syntax_error("Field must be inside a section");
-        return -1;
-    }
-    after_field = 1; 
-    return FIELD; 
-}
-":"         { 
-    if (!after_field) {
-        syntax_error("Colon must follow field name");
-        return -1;
-    }
-    after_field = 0; 
-    after_colon = 1; 
-    return ':'; 
-}
-";"         { 
-    if (!after_colon && !after_type) {
-        syntax_error("Semicolon must follow field type and attributes");
-        return -1;
-    }
-    after_colon = 0;
-    after_type = 0;
-    return ';'; 
-}
+"form"      { return FORM; }
+"section"   { return SECTION; }
+"field"     { return FIELD; }
+":"         { after_colon = 1; return ':'; }
+";"         { after_colon = 0; return ';'; }
 "{"         { return '{'; }
-"}"         { 
-    if (after_section) {
-        after_section = 0;
-    } else if (after_form) {
-        after_form = 0;
-    }
-    return '}';
-}
+"}"         { return '}'; }
 
 "text"      { 
     if (after_colon) {
-        after_type = 1;
+        after_colon = 0;
         return TEXT;
-    } else {
-        yylval.str = strdup(yytext);
-        return IDENTIFIER;
     }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
 }
-
 "email"     { 
     if (after_colon) {
-        after_type = 1;
+        after_colon = 0;
         return EMAIL;
-    } else {
-        yylval.str = strdup(yytext);
-        return IDENTIFIER;
     }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
 }
-
 "password"  { 
     if (after_colon) {
-        after_type = 1;
+        after_colon = 0;
         return PASSWORD;
-    } else {
-        yylval.str = strdup(yytext);
-        return IDENTIFIER;
     }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
 }
-
-"number"    {
+"number"    { 
     if (after_colon) {
-        after_type = 1;
+        after_colon = 0;
         return NUMBER;
-    } else {
-        yylval.str = strdup(yytext);
-        return IDENTIFIER;
     }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
 }
-
-"required"  { 
-    if (!after_colon && !after_type) {
-        syntax_error("Field attributes must follow field type");
-        return -1;
-    }
-    return REQUIRED; 
-}
-"optional"  { 
-    if (!after_colon && !after_type) {
-        syntax_error("Field attributes must follow field type");
-        return -1;
-    }
-    return OPTIONAL; 
-}
-
-[a-zA-Z_][a-zA-Z0-9_]* { 
+"textarea"  { 
     if (after_colon) {
-        syntax_error("Invalid field type");
-        return -1;
+        after_colon = 0;
+        return TEXTAREA;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"date"      { 
+    if (after_colon) {
+        after_colon = 0;
+        return DATE;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"checkbox"  { 
+    if (after_colon) {
+        after_colon = 0;
+        return CHECKBOX;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"dropdown"  { 
+    if (after_colon) {
+        after_colon = 0;
+        return DROPDOWN;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"radio"     { 
+    if (after_colon) {
+        after_colon = 0;
+        return RADIO;
+    }
+    yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+"file"      { 
+    if (after_colon) {
+        after_colon = 0;
+        return FILE_TYPE;
     }
     yylval.str = strdup(yytext);
     return IDENTIFIER;
 }
 
-[0-9]+      {
+"required"  { return REQUIRED; }
+"optional"  { return OPTIONAL; }
+"minLength" { return MINLENGTH; }
+"maxLength" { return MAXLENGTH; }
+"min"       { return MIN; }
+"max"       { return MAX; }
+"rows"      { return ROWS; }
+"cols"      { return COLS; }
+"pattern"   { return PATTERN; }
+"default"   { return DEFAULT; }
+
+[a-zA-Z_][a-zA-Z0-9_]* { 
     yylval.str = strdup(yytext);
+    return IDENTIFIER;
+}
+
+[0-9]+      {
+    yylval.num = atoi(yytext);
     return NUMBER_LITERAL;
+}
+
+\"([^"\\]|\\.)*\"  {
+    // Remove quotes and process escaped characters
+    yytext[strlen(yytext) - 1] = '\0';
+    yylval.str = process_string(yytext + 1);
+    return STRING_LITERAL;
 }
 
 .           { 
     syntax_error("Unexpected character");
-    return -1;
+    return yytext[0]; 
 }
 
 %%

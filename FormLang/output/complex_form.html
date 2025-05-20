@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ComplexForm</title>
 <style>
 body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
 form { background: #f5f5f5; padding: 20px; border-radius: 5px; }
 section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }
 h2 { color: #333; margin-top: 0; }
 label { display: block; margin-bottom: 5px; }
-input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
 input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
 input[type=submit]:hover { background: #45a049; }
 </style>
@@ -17,30 +16,52 @@ input[type=submit]:hover { background: #45a049; }
 <form>
 <section>
 <h2>PersonalInfo</h2>
-<label for="fullName">fullName *</label>
-<input type="text" id="fullName" name="fullName" required>
-<label for="email">email *</label>
-<input type="email" id="email" name="email" required>
-<label for="phone">phone</label>
-<input type="number" id="phone" name="phone">
+<label for="full_name">full_name *</label>
+<input type="text" id="full_name" name="full_name" required minlength="5" maxlength="100" pattern="^[A-Za-z ]+$">
+<label for="birth_date">birth_date *</label>
+<input type="date" id="birth_date" name="birth_date" required>
 <label for="age">age *</label>
-<input type="number" id="age" name="age" required>
+<input type="number" id="age" name="age" required min="18" max="120">
+<label for="gender">gender *</label>
+<div class="radio-group">
+  <input type="radio" id="gender_1" name="gender" value="option1" required>
+  <label for="gender_1">Option 1</label><br>
+  <input type="radio" id="gender_2" name="gender" value="option2" required>
+  <label for="gender_2">Option 2</label>
+</div>
 </section>
 <section>
-<h2>Security</h2>
+<h2>ContactInfo</h2>
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required>
+<label for="phone">phone *</label>
+<input type="text" id="phone" name="phone" required pattern="^[0-9]{10}$">
+<label for="address">address *</label>
+<textarea id="address" name="address" rows="3" cols="50" required></textarea>
+</section>
+<section>
+<h2>AccountInfo</h2>
 <label for="username">username *</label>
-<input type="text" id="username" name="username" required>
+<input type="text" id="username" name="username" required minlength="5" maxlength="20" pattern="^[a-zA-Z0-9_]+$">
 <label for="password">password *</label>
-<input type="password" id="password" name="password" required>
-<label for="confirmPassword">confirmPassword *</label>
-<input type="password" id="confirmPassword" name="confirmPassword" required>
+<input type="password" id="password" name="password" required minlength="8">
+<label for="confirm_password">confirm_password *</label>
+<input type="password" id="confirm_password" name="confirm_password" required minlength="8">
 </section>
 <section>
 <h2>Preferences</h2>
-<label for="theme">theme</label>
-<input type="text" id="theme" name="theme">
-<label for="notifications">notifications</label>
-<input type="text" id="notifications" name="notifications">
+<label for="newsletter">newsletter</label>
+<input type="checkbox" id="newsletter" name="newsletter" value="1">
+<label for="theme">theme *</label>
+<select id="theme" name="theme" required>
+  <option value="">Select an option</option>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+</select>
+<label for="bio">bio</label>
+<textarea id="bio" name="bio" rows="5" cols="40"></textarea>
+<label for="avatar">avatar</label>
+<input type="file" id="avatar" name="avatar">
 </section>
 <input type="submit" value="Submit">
 </form>
