@@ -11,13 +11,13 @@ form ComplexForm {
         field phone: text pattern "^[0-9]{10}$" required;
         field address: textarea rows 3 cols 50 required;
     }
-
+    
     section AccountInfo {
         field username: text minLength 5 maxLength 20 pattern "^[a-zA-Z0-9_]+$" required;
         field password: password minLength 8 required;
         field confirm_password: password minLength 8 required;
     }
-
+    
     section Preferences {
         field newsletter: checkbox default 1;
         field theme: dropdown required;

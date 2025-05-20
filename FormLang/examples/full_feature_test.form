@@ -1,0 +1,41 @@
+form FullFeatureTest {
+    section TextFields {
+        field username: text pattern "^[A-Za-z0-9_]{3,20}$" minLength 3 maxLength 20 default "user123" required;
+        field nickname: text optional;
+        field bio: textarea minLength 10 maxLength 200 rows 4 cols 40 default "Hello!" required;
+    }
+    section EmailPassword {
+        field email: email pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required;
+        field work_email: email default "user@company.com" optional;
+        field password: password pattern "^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" minLength 8 maxLength 32 required;
+        field confirm_password: password required;
+    }
+    section NumbersAndDates {
+        field age: number min 18 max 120 default "25" required;
+        field price: number min 0.01 max 999.99 required;
+        field quantity: number default 1 min 1 max 100 required;
+        field birth_date: date required;
+        field appointment: date default "2024-12-31" optional;
+    }
+    section Choices {
+        field gender: radio default "other" required;
+        field subscription: radio optional;
+        field country: dropdown required;
+        field language: dropdown default "en" optional;
+    }
+    section Files {
+        field document: file accept "*.pdf,*.docx" required;
+        field image: file accept "image/*" optional;
+        field attachment: file accept "*/*" optional;
+    }
+    section Checkboxes {
+        field terms: checkbox required;
+        field newsletter: checkbox default "true" optional;
+    }
+    section Patterns {
+        field phone: text pattern "^\+?[\d\s-]{10,}$" required;
+        field postal_code: text pattern "^[A-Z]{2}\d{2}\s?\d{2}[A-Z]{2}$" required;
+        field url: text pattern "^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$" optional;
+        field password_strong: password pattern "^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$" required;
+    }
+} 

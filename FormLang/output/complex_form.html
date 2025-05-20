@@ -10,6 +10,8 @@ label { display: block; margin-bottom: 5px; }
 input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
 input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
 input[type=submit]:hover { background: #45a049; }
+.radio-group { margin-bottom: 10px; }
+.radio-group label { display: inline; margin-left: 5px; }
 </style>
 </head>
 <body>
@@ -25,9 +27,9 @@ input[type=submit]:hover { background: #45a049; }
 <label for="gender">gender *</label>
 <div class="radio-group">
   <input type="radio" id="gender_1" name="gender" value="option1" required>
-  <label for="gender_1">Option 1</label><br>
+  <span>Option 1</span><br>
   <input type="radio" id="gender_2" name="gender" value="option2" required>
-  <label for="gender_2">Option 2</label>
+  <span>Option 2</span>
 </div>
 </section>
 <section>
@@ -51,17 +53,16 @@ input[type=submit]:hover { background: #45a049; }
 <section>
 <h2>Preferences</h2>
 <label for="newsletter">newsletter</label>
-<input type="checkbox" id="newsletter" name="newsletter" value="1">
+<input type="checkbox" id="newsletter" name="newsletter" value="1" checked>
 <label for="theme">theme *</label>
 <select id="theme" name="theme" required>
-  <option value="">Select an option</option>
   <option value="option1">Option 1</option>
   <option value="option2">Option 2</option>
 </select>
 <label for="bio">bio</label>
 <textarea id="bio" name="bio" rows="5" cols="40"></textarea>
 <label for="avatar">avatar</label>
-<input type="file" id="avatar" name="avatar">
+<input type="file" id="avatar" name="avatar" accept="*/*">
 </section>
 <input type="submit" value="Submit">
 </form>

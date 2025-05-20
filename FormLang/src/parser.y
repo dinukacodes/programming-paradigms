@@ -119,7 +119,7 @@ void add_field_to_section(Section* section, const char* name, FieldType type, Fi
     
     if (attrs->pattern) {
         field->attributes.pattern = strdup(attrs->pattern);
-    }
+            }
     if (attrs->default_value) {
         field->attributes.default_value = strdup(attrs->default_value);
     }
@@ -285,7 +285,7 @@ field_attributes: /* empty */
         if ($2.pattern) {
             if ($$.pattern) free($$.pattern);
             $$.pattern = $2.pattern;
-        }
+    }
         if ($2.default_value) {
             if ($$.default_value) free($$.default_value);
             $$.default_value = $2.default_value;

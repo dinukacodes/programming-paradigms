@@ -189,7 +189,7 @@ void add_field_to_section(Section* section, const char* name, FieldType type, Fi
     
     if (attrs->pattern) {
         field->attributes.pattern = strdup(attrs->pattern);
-    }
+            }
     if (attrs->default_value) {
         field->attributes.default_value = strdup(attrs->default_value);
     }
@@ -1836,7 +1836,7 @@ yyreduce:
         if ((yyvsp[0].field_attrs).pattern) {
             if ((yyval.field_attrs).pattern) free((yyval.field_attrs).pattern);
             (yyval.field_attrs).pattern = (yyvsp[0].field_attrs).pattern;
-        }
+    }
         if ((yyvsp[0].field_attrs).default_value) {
             if ((yyval.field_attrs).default_value) free((yyval.field_attrs).default_value);
             (yyval.field_attrs).default_value = (yyvsp[0].field_attrs).default_value;
