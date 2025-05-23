@@ -1,0 +1,6 @@
+form ErrorDemo {
+    section MissingSemicolon {
+        field name: text
+        field email: email;
+    }
+} 

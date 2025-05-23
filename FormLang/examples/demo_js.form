@@ -1,0 +1,10 @@
+form demoJsValidation {
+    section BasicValidation {
+        field age: number;
+    }
+ 
+    validate {
+        if age < 18 { error "You must be at least 18 years old."; }
+        if age > 120 { error "Please enter a valid age."; }
+    }
+} 

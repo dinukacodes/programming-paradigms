@@ -226,8 +226,10 @@ void merge_field_attributes(FieldAttributes* dest, FieldAttributes* src) {
 %type <num> NUMBER_LITERAL
 %type <form> form
 %type <field_type> field_type
-%type <field_attrs> field_attributes attribute attribute_opt_semicolon
-%type <validation_rule> validation_block validation_rule condition
+%type <field_attrs> field_attributes attribute
+%type <validation_rule> validation_rule condition
+
+%type <void> form_body form_item field_list validation_rules
 
 %define parse.error verbose
 
@@ -240,11 +242,13 @@ form: FORM IDENTIFIER '{' { current_form = create_form($2); } form_body '}'
             YYERROR;
         }
         generate_html(stdout);
-        $$ = current_form;
+        cleanup_form(current_form);
+        current_form = NULL; // Reset global for next form if needed
     }
     ;
 
 form_body:
+    /* empty */
     | form_body form_item
     ;
 
@@ -252,10 +256,6 @@ form_item:
       section
     | validation_block
     | metadata_declaration
-    ;
-
-section_list: 
-    | section_list section
     ;
 
 section: SECTION IDENTIFIER '{' { current_section = create_section($2); } field_list '}' { add_section_to_form(current_form, current_section); current_section = NULL; }
@@ -272,22 +272,8 @@ section: SECTION IDENTIFIER '{' { current_section = create_section($2); } field_
     }
     ;
 
-section_header: SECTION IDENTIFIER
-    {
-        if (current_section != NULL) {
-            yyerror("Nested sections are not allowed");
-            YYERROR;
-        }
-        current_section = create_section($2);
-        if (!current_section) {
-            yyerror("Failed to create section");
-            YYERROR;
-        }
-        add_section_to_form(current_form, current_section);
-    }
-    ;
-
 field_list:
+    /* empty */
     | field_list field_declaration
     | field_list error ';'
     {
@@ -297,7 +283,7 @@ field_list:
     }
     ;
 
-field_declaration: FIELD IDENTIFIER ':' field_type field_attributes
+field_declaration: FIELD IDENTIFIER ':' field_type field_attributes ';'
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
@@ -307,6 +293,7 @@ field_declaration: FIELD IDENTIFIER ':' field_type field_attributes
             yyerror("Duplicate field name");
             YYERROR;
         }
+        // Attributes are handled within the field_attributes rule and passed via union
         add_field_to_section(current_section, $2, $4, &$5);
     }
     ;
@@ -326,13 +313,8 @@ field_type: TEXT     { $$ = FIELD_TEXT; }
           ;
 
 field_attributes:
-    | attribute_opt_semicolon
-    | field_attributes attribute_opt_semicolon
-    ;
-
-attribute_opt_semicolon:
-    attribute ';'
-    | attribute
+    /* empty */
+    | field_attributes attribute
     ;
 
 attribute:
@@ -350,10 +332,6 @@ attribute:
     | STRENGTH NUMBER_LITERAL { $$.strength_required = $2; }
     ;
 
-validation_blocks:
-    | validation_blocks validation_block
-    ;
-
 validation_block: VALIDATE '{' validation_rules '}'
     {
         // Validation block is already processed by the rules
@@ -361,6 +339,7 @@ validation_block: VALIDATE '{' validation_rules '}'
     ;
 
 validation_rules:
+    /* empty */
     | validation_rules validation_rule
     ;
 
@@ -371,10 +350,12 @@ validation_rule: IF condition '{' ERROR STRING_LITERAL ';' '}'
             yyerror("Memory allocation failed for validation rule");
             YYERROR;
         }
-        rule->condition = $2;
-        rule->error_message = $5;
+        rule->condition = strdup($2);
+        rule->error_message = strdup($5);
         rule->next = current_form->validation_rules;
         current_form->validation_rules = rule;
+        // Free temporary strings from condition and error message tokens
+        free($2); free($5);
     }
     ;
 
@@ -383,42 +364,42 @@ condition: IDENTIFIER LT NUMBER_LITERAL
         char* cond = malloc(50);
         sprintf(cond, "%s < %d", $1, $3);
         $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     | IDENTIFIER GT NUMBER_LITERAL
     {
         char* cond = malloc(50);
         sprintf(cond, "%s > %d", $1, $3);
         $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     | IDENTIFIER LTE NUMBER_LITERAL
     {
         char* cond = malloc(50);
         sprintf(cond, "%s <= %d", $1, $3);
         $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     | IDENTIFIER GTE NUMBER_LITERAL
     {
         char* cond = malloc(50);
         sprintf(cond, "%s >= %d", $1, $3);
         $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     | IDENTIFIER EQ NUMBER_LITERAL
     {
         char* cond = malloc(50);
         sprintf(cond, "%s == %d", $1, $3);
         $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     | IDENTIFIER NEQ NUMBER_LITERAL
     {
         char* cond = malloc(50);
         sprintf(cond, "%s != %d", $1, $3);
         $$ = cond;
-    }
-    | IDENTIFIER EQ IDENTIFIER
-    {
-        char* cond = malloc(50);
-        sprintf(cond, "%s == %s", $1, $3);
-        $$ = cond;
+        free($1); // Free the identifier string from the token
     }
     ;
 
@@ -429,8 +410,9 @@ metadata_declaration: META IDENTIFIER '=' STRING_LITERAL ';'
             YYERROR;
         }
         add_metadata(current_form, $2, $4);
-        free($2);  // Free the key
-        free($4);  // Free the value
+        // Free the key and value strings from the tokens after use
+        free($2);
+        free($4);
     }
     ;
 
@@ -448,9 +430,12 @@ int main(int argc, char **argv) {
             return 1;
         }
         yyin = file;
+    } else {
+        // If no input file is provided, read from stdin
+        yyin = stdin;
     }
     yyparse();
-    cleanup_form(current_form);
+    // Cleanup is done in the form rule's semantic action
     return 0;
 }
 
