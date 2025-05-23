@@ -297,18 +297,17 @@ field_list:
     }
     ;
 
-field_declaration: FIELD IDENTIFIER ':' field_type '{' field_attributes '}'
+field_declaration: FIELD IDENTIFIER ':' field_type field_attributes
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
             YYERROR;
         }
         if (check_duplicate_field($2)) {
-            yyerror("Duplicate field name found");
+            yyerror("Duplicate field name");
             YYERROR;
         }
-        add_field_to_section(current_section, $2, $4, &$6);
-        free($2); // Free the field name
+        add_field_to_section(current_section, $2, $4, &$5);
     }
     ;
 
@@ -327,29 +326,28 @@ field_type: TEXT     { $$ = FIELD_TEXT; }
           ;
 
 field_attributes:
-      /* empty */ { init_field_attributes(&$$); }
-    | field_attributes attribute_opt_semicolon { $$ = $1; merge_field_attributes(&$$, &$2); }
+    | attribute_opt_semicolon
+    | field_attributes attribute_opt_semicolon
     ;
 
 attribute_opt_semicolon:
-      attribute ';' { $$ = $1; }
-    | attribute     { $$ = $1; }
+    attribute ';'
+    | attribute
     ;
 
 attribute:
-      REQUIRED    { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 1; $$ = tmp; }
-    | OPTIONAL    { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 0; $$ = tmp; }
-    | MINLENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_length = $3; $$ = tmp; }
-    | MAXLENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_length = $3; $$ = tmp; }
-    | MIN '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_value = $3; $$ = tmp; }
-    | MAX '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_value = $3; $$ = tmp; }
-    | ROWS '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.rows = $3; $$ = tmp; }
-    | COLS '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.cols = $3; $$ = tmp; }
-    | PATTERN '=' STRING_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.pattern = $3; $$ = tmp; }
-    | DEFAULT '=' STRING_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = $3; $$ = tmp; }
-    | DEFAULT '=' IDENTIFIER { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = strdup($3); $$ = tmp; }
-    | STRENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.strength_required = $3; $$ = tmp; }
-    | CONFIRM '=' IDENTIFIER { FieldAttributes tmp; init_field_attributes(&tmp); tmp.confirm_field = $3; $$ = tmp; }
+    REQUIRED { $$.required = 1; }
+    | OPTIONAL { $$.required = 0; }
+    | MINLENGTH NUMBER_LITERAL { $$.min_length = $2; }
+    | MAXLENGTH NUMBER_LITERAL { $$.max_length = $2; }
+    | MIN NUMBER_LITERAL { $$.min_value = $2; }
+    | MAX NUMBER_LITERAL { $$.max_value = $2; }
+    | ROWS NUMBER_LITERAL { $$.rows = $2; }
+    | COLS NUMBER_LITERAL { $$.cols = $2; }
+    | PATTERN STRING_LITERAL { $$.pattern = $2; }
+    | DEFAULT STRING_LITERAL { $$.default_value = $2; }
+    | CONFIRM IDENTIFIER { $$.confirm_field = $2; }
+    | STRENGTH NUMBER_LITERAL { $$.strength_required = $2; }
     ;
 
 validation_blocks:

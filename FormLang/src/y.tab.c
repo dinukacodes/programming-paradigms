@@ -842,7 +842,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   95
+#define YYLAST   82
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  50
@@ -851,7 +851,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  57
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  111
+#define YYNSTATES  99
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   299
@@ -905,11 +905,11 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,   236,   236,   236,   247,   248,   252,   253,   254,   261,
-     261,   262,   266,   290,   291,   292,   300,   315,   316,   317,
-     318,   319,   320,   321,   322,   323,   324,   325,   326,   330,
-     331,   335,   336,   340,   341,   342,   343,   344,   345,   346,
-     347,   348,   349,   350,   351,   352,   359,   365,   366,   369,
-     383,   389,   395,   401,   407,   413,   419,   427
+     261,   262,   266,   290,   291,   292,   300,   314,   315,   316,
+     317,   318,   319,   320,   321,   322,   323,   324,   325,   328,
+     329,   330,   334,   335,   339,   340,   341,   342,   343,   344,
+     345,   346,   347,   348,   349,   350,   357,   363,   364,   367,
+     381,   387,   393,   399,   405,   411,   417,   425
 };
 #endif
 
@@ -946,7 +946,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-20)
+#define YYPACT_NINF (-29)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -960,18 +960,16 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       0,    -6,    32,   -11,   -20,   -20,   -20,    -3,     4,     5,
-      -8,   -20,   -20,   -20,   -20,   -20,     1,   -10,   -20,    -5,
-      -4,     7,   -18,   -20,   -20,   -20,    -9,    13,   -20,   -20,
-      -1,   -20,   -19,    14,    15,    29,   -20,   -20,    31,    33,
-      34,    35,    -2,    36,    25,   -20,    16,   -20,   -20,   -20,
-     -20,   -20,   -20,   -20,    37,    41,    22,   -20,   -20,   -20,
-     -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,    26,
-      27,   -20,   -20,   -13,   -20,   -20,    23,    28,    30,    38,
-      39,    40,    42,    43,    44,    45,   -20,   -20,    48,    46,
-      49,    50,    51,    52,    53,    47,    -7,    55,    58,   -20,
-     -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,
-     -20
+       2,   -28,    28,   -15,   -29,   -29,   -29,    -3,     3,     4,
+     -13,   -29,   -29,   -29,   -29,   -29,     1,   -16,   -29,   -10,
+      -9,     5,   -17,   -29,   -29,   -29,    -8,     9,   -29,   -29,
+      -1,   -29,   -18,    -4,    -5,    13,   -29,   -29,    27,    30,
+      31,    32,    -6,    33,    24,   -29,    18,   -29,   -29,   -29,
+     -29,   -29,   -29,   -29,    34,     0,    14,   -29,   -29,   -29,
+     -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,    29,
+      22,   -29,   -29,    37,    38,    39,    40,    41,    42,    43,
+      44,    47,    48,    29,   -29,    35,   -29,   -29,   -29,   -29,
+     -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -985,26 +983,24 @@ static const yytype_int8 yydefact[] =
        0,    57,     0,     0,     0,     0,    10,    14,     0,     0,
        0,     0,     0,     0,     0,    15,     0,    50,    51,    52,
       53,    56,    54,    55,     0,     0,     0,    17,    18,    19,
-      20,    21,    22,    23,    24,    25,    26,    27,    28,     0,
-       0,    29,    49,     0,    33,    34,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    16,    30,    32,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    31,
-      35,    36,    37,    38,    39,    40,    41,    43,    42,    45,
-      44
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+       0,    34,    35,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,    16,    30,    33,    49,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    31,    32
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,
-     -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20
+     -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,   -29,
+     -29,    -2,   -29,   -29,   -29,   -29,   -29,   -29
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
        0,     2,     6,     7,    12,    13,    25,    30,    37,    69,
-      73,    87,    88,    14,    22,    29,    33,    15
+      83,    84,    85,    14,    22,    29,    33,    15
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -1012,30 +1008,28 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      34,     8,    19,     1,    35,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    27,    38,    39,
-      40,    41,    42,    43,   107,     3,   108,     9,    28,    51,
-      52,    10,     4,    86,     5,    16,    17,    18,    31,    21,
-      26,    23,    24,    11,    32,    36,    20,    57,    58,    59,
-      60,    61,    62,    63,    64,    65,    66,    67,    68,    44,
-      46,    54,    45,    47,    55,    48,    49,    50,    53,    70,
-      56,    71,    89,    72,     0,     0,     0,    90,   100,    91,
-     106,   101,   102,   103,   104,   105,   109,    92,    93,    94,
-     110,    95,    96,    97,    98,    99
+      34,     8,    19,     3,    35,     1,    57,    58,    59,    60,
+      61,    62,    63,    64,    65,    66,    67,    68,    27,    38,
+      39,    40,    41,    42,    43,    51,    52,     9,     4,    28,
+       5,    10,    18,    21,    16,    17,    23,    24,    26,    31,
+      32,    44,    45,    11,    46,    36,    20,    71,    72,    73,
+      74,    75,    76,    77,    78,    79,    80,    81,    82,    47,
+      54,    70,    48,    49,    50,    53,    55,    56,    86,    87,
+      88,    89,    90,    91,    92,     0,    93,    94,    95,     0,
+      96,    97,    98
 };
 
 static const yytype_int8 yycheck[] =
 {
-       1,     4,     1,     3,     5,    18,    19,    20,    21,    22,
-      23,    24,    25,    26,    27,    28,    29,    35,    37,    38,
-      39,    40,    41,    42,    31,    31,    33,    30,    46,    31,
-      32,    34,     0,    46,    45,    31,    31,    45,    47,    49,
-      33,    46,    46,    46,    31,    46,    45,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    45,
-      31,    36,    47,    32,    48,    32,    32,    32,    32,    47,
-      33,    45,    49,    46,    -1,    -1,    -1,    49,    32,    49,
-      33,    32,    32,    32,    32,    32,    31,    49,    49,    49,
-      32,    49,    49,    49,    49,    47
+       1,     4,     1,    31,     5,     3,     6,     7,     8,     9,
+      10,    11,    12,    13,    14,    15,    16,    17,    35,    37,
+      38,    39,    40,    41,    42,    31,    32,    30,     0,    46,
+      45,    34,    45,    49,    31,    31,    46,    46,    33,    47,
+      31,    45,    47,    46,    31,    46,    45,    18,    19,    20,
+      21,    22,    23,    24,    25,    26,    27,    28,    29,    32,
+      36,    47,    32,    32,    32,    32,    48,    33,    46,    32,
+      32,    32,    32,    32,    32,    -1,    33,    33,    31,    -1,
+      32,    83,    47
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -1049,11 +1043,9 @@ static const yytype_int8 yystos[] =
       39,    40,    41,    42,    45,    47,    31,    32,    32,    32,
       32,    31,    32,    32,    36,    48,    33,     6,     7,     8,
        9,    10,    11,    12,    13,    14,    15,    16,    17,    59,
-      47,    45,    46,    60,    18,    19,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    46,    61,    62,    49,
-      49,    49,    49,    49,    49,    49,    49,    49,    49,    47,
-      32,    32,    32,    32,    32,    32,    33,    31,    33,    31,
-      32
+      47,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    60,    61,    62,    46,    32,    32,    32,
+      32,    32,    32,    33,    33,    31,    32,    61,    47
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -1062,7 +1054,7 @@ static const yytype_int8 yyr1[] =
        0,    50,    52,    51,    53,    53,    54,    54,    54,    56,
       55,    55,    55,    57,    57,    57,    58,    59,    59,    59,
       59,    59,    59,    59,    59,    59,    59,    59,    59,    60,
-      60,    61,    61,    62,    62,    62,    62,    62,    62,    62,
+      60,    60,    61,    61,    62,    62,    62,    62,    62,    62,
       62,    62,    62,    62,    62,    62,    63,    64,    64,    65,
       66,    66,    66,    66,    66,    66,    66,    67
 };
@@ -1071,10 +1063,10 @@ static const yytype_int8 yyr1[] =
 static const yytype_int8 yyr2[] =
 {
        0,     2,     0,     6,     0,     2,     1,     1,     1,     0,
-       6,     4,     4,     0,     2,     3,     7,     1,     1,     1,
+       6,     4,     4,     0,     2,     3,     5,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     0,
-       2,     2,     1,     1,     1,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     4,     0,     2,     7,
+       1,     2,     2,     1,     1,     1,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     4,     0,     2,     7,
        3,     3,     3,     3,     3,     3,     3,     5
 };
 
@@ -1811,7 +1803,7 @@ yyreduce:
   case 2: /* $@1: %empty  */
 #line 236 "parser.y"
                           { current_form = create_form((yyvsp[-1].str)); }
-#line 1815 "y.tab.c"
+#line 1807 "y.tab.c"
     break;
 
   case 3: /* form: FORM IDENTIFIER '{' $@1 form_body '}'  */
@@ -1824,19 +1816,19 @@ yyreduce:
         generate_html(stdout);
         (yyval.form) = current_form;
     }
-#line 1828 "y.tab.c"
+#line 1820 "y.tab.c"
     break;
 
   case 9: /* $@2: %empty  */
 #line 261 "parser.y"
                                 { current_section = create_section((yyvsp[-1].str)); }
-#line 1834 "y.tab.c"
+#line 1826 "y.tab.c"
     break;
 
   case 10: /* section: SECTION IDENTIFIER '{' $@2 field_list '}'  */
 #line 261 "parser.y"
                                                                                          { add_section_to_form(current_form, current_section); current_section = NULL; }
-#line 1840 "y.tab.c"
+#line 1832 "y.tab.c"
     break;
 
   case 11: /* section: SECTION IDENTIFIER '{' '}'  */
@@ -1844,7 +1836,7 @@ yyreduce:
     {
         current_section = NULL;
     }
-#line 1848 "y.tab.c"
+#line 1840 "y.tab.c"
     break;
 
   case 12: /* section: SECTION IDENTIFIER error '}'  */
@@ -1855,7 +1847,7 @@ yyreduce:
         yyclearin;
         yyerrok;
     }
-#line 1859 "y.tab.c"
+#line 1851 "y.tab.c"
     break;
 
   case 15: /* field_list: field_list error ';'  */
@@ -1865,210 +1857,179 @@ yyreduce:
         yyclearin;
         yyerrok;
     }
-#line 1869 "y.tab.c"
+#line 1861 "y.tab.c"
     break;
 
-  case 16: /* field_declaration: FIELD IDENTIFIER ':' field_type '{' field_attributes '}'  */
+  case 16: /* field_declaration: FIELD IDENTIFIER ':' field_type field_attributes  */
 #line 301 "parser.y"
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
             YYERROR;
         }
-        if (check_duplicate_field((yyvsp[-5].str))) {
-            yyerror("Duplicate field name found");
+        if (check_duplicate_field((yyvsp[-3].str))) {
+            yyerror("Duplicate field name");
             YYERROR;
         }
-        add_field_to_section(current_section, (yyvsp[-5].str), (yyvsp[-3].field_type), &(yyvsp[-1].field_attrs));
-        free((yyvsp[-5].str)); // Free the field name
+        add_field_to_section(current_section, (yyvsp[-3].str), (yyvsp[-1].field_type), &(yyvsp[0].field_attrs));
     }
-#line 1886 "y.tab.c"
+#line 1877 "y.tab.c"
     break;
 
   case 17: /* field_type: TEXT  */
-#line 315 "parser.y"
+#line 314 "parser.y"
                      { (yyval.field_type) = FIELD_TEXT; }
-#line 1892 "y.tab.c"
+#line 1883 "y.tab.c"
     break;
 
   case 18: /* field_type: EMAIL  */
-#line 316 "parser.y"
+#line 315 "parser.y"
                      { (yyval.field_type) = FIELD_EMAIL; }
-#line 1898 "y.tab.c"
+#line 1889 "y.tab.c"
     break;
 
   case 19: /* field_type: PASSWORD  */
-#line 317 "parser.y"
+#line 316 "parser.y"
                      { (yyval.field_type) = FIELD_PASSWORD; }
-#line 1904 "y.tab.c"
+#line 1895 "y.tab.c"
     break;
 
   case 20: /* field_type: NUMBER  */
-#line 318 "parser.y"
+#line 317 "parser.y"
                      { (yyval.field_type) = FIELD_NUMBER; }
-#line 1910 "y.tab.c"
+#line 1901 "y.tab.c"
     break;
 
   case 21: /* field_type: TEXTAREA  */
-#line 319 "parser.y"
+#line 318 "parser.y"
                      { (yyval.field_type) = FIELD_TEXTAREA; }
-#line 1916 "y.tab.c"
+#line 1907 "y.tab.c"
     break;
 
   case 22: /* field_type: DATE  */
-#line 320 "parser.y"
+#line 319 "parser.y"
                      { (yyval.field_type) = FIELD_DATE; }
-#line 1922 "y.tab.c"
+#line 1913 "y.tab.c"
     break;
 
   case 23: /* field_type: CHECKBOX  */
-#line 321 "parser.y"
+#line 320 "parser.y"
                      { (yyval.field_type) = FIELD_CHECKBOX; }
-#line 1928 "y.tab.c"
+#line 1919 "y.tab.c"
     break;
 
   case 24: /* field_type: DROPDOWN  */
-#line 322 "parser.y"
+#line 321 "parser.y"
                      { (yyval.field_type) = FIELD_DROPDOWN; }
-#line 1934 "y.tab.c"
+#line 1925 "y.tab.c"
     break;
 
   case 25: /* field_type: RADIO  */
-#line 323 "parser.y"
+#line 322 "parser.y"
                      { (yyval.field_type) = FIELD_RADIO; }
-#line 1940 "y.tab.c"
+#line 1931 "y.tab.c"
     break;
 
   case 26: /* field_type: FILE_TYPE  */
-#line 324 "parser.y"
+#line 323 "parser.y"
                       { (yyval.field_type) = FIELD_FILE; }
-#line 1946 "y.tab.c"
+#line 1937 "y.tab.c"
     break;
 
   case 27: /* field_type: USERNAME  */
-#line 325 "parser.y"
+#line 324 "parser.y"
                      { (yyval.field_type) = FIELD_USERNAME; }
-#line 1952 "y.tab.c"
+#line 1943 "y.tab.c"
     break;
 
   case 28: /* field_type: ADDRESS  */
-#line 326 "parser.y"
+#line 325 "parser.y"
                      { (yyval.field_type) = FIELD_ADDRESS; }
-#line 1958 "y.tab.c"
+#line 1949 "y.tab.c"
     break;
 
-  case 29: /* field_attributes: %empty  */
-#line 330 "parser.y"
-                  { init_field_attributes(&(yyval.field_attrs)); }
-#line 1964 "y.tab.c"
+  case 34: /* attribute: REQUIRED  */
+#line 339 "parser.y"
+             { (yyval.field_attrs).required = 1; }
+#line 1955 "y.tab.c"
     break;
 
-  case 30: /* field_attributes: field_attributes attribute_opt_semicolon  */
-#line 331 "parser.y"
-                                               { (yyval.field_attrs) = (yyvsp[-1].field_attrs); merge_field_attributes(&(yyval.field_attrs), &(yyvsp[0].field_attrs)); }
-#line 1970 "y.tab.c"
-    break;
-
-  case 31: /* attribute_opt_semicolon: attribute ';'  */
-#line 335 "parser.y"
-                    { (yyval.field_attrs) = (yyvsp[-1].field_attrs); }
-#line 1976 "y.tab.c"
-    break;
-
-  case 32: /* attribute_opt_semicolon: attribute  */
-#line 336 "parser.y"
-                    { (yyval.field_attrs) = (yyvsp[0].field_attrs); }
-#line 1982 "y.tab.c"
-    break;
-
-  case 33: /* attribute: REQUIRED  */
+  case 35: /* attribute: OPTIONAL  */
 #line 340 "parser.y"
-                  { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 1; (yyval.field_attrs) = tmp; }
-#line 1988 "y.tab.c"
+               { (yyval.field_attrs).required = 0; }
+#line 1961 "y.tab.c"
     break;
 
-  case 34: /* attribute: OPTIONAL  */
+  case 36: /* attribute: MINLENGTH NUMBER_LITERAL  */
 #line 341 "parser.y"
-                  { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 0; (yyval.field_attrs) = tmp; }
-#line 1994 "y.tab.c"
+                               { (yyval.field_attrs).min_length = (yyvsp[0].num); }
+#line 1967 "y.tab.c"
     break;
 
-  case 35: /* attribute: MINLENGTH '=' NUMBER_LITERAL  */
+  case 37: /* attribute: MAXLENGTH NUMBER_LITERAL  */
 #line 342 "parser.y"
-                                   { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_length = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2000 "y.tab.c"
+                               { (yyval.field_attrs).max_length = (yyvsp[0].num); }
+#line 1973 "y.tab.c"
     break;
 
-  case 36: /* attribute: MAXLENGTH '=' NUMBER_LITERAL  */
+  case 38: /* attribute: MIN NUMBER_LITERAL  */
 #line 343 "parser.y"
-                                   { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_length = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2006 "y.tab.c"
+                         { (yyval.field_attrs).min_value = (yyvsp[0].num); }
+#line 1979 "y.tab.c"
     break;
 
-  case 37: /* attribute: MIN '=' NUMBER_LITERAL  */
+  case 39: /* attribute: MAX NUMBER_LITERAL  */
 #line 344 "parser.y"
-                             { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_value = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2012 "y.tab.c"
+                         { (yyval.field_attrs).max_value = (yyvsp[0].num); }
+#line 1985 "y.tab.c"
     break;
 
-  case 38: /* attribute: MAX '=' NUMBER_LITERAL  */
+  case 40: /* attribute: ROWS NUMBER_LITERAL  */
 #line 345 "parser.y"
-                             { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_value = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2018 "y.tab.c"
+                          { (yyval.field_attrs).rows = (yyvsp[0].num); }
+#line 1991 "y.tab.c"
     break;
 
-  case 39: /* attribute: ROWS '=' NUMBER_LITERAL  */
+  case 41: /* attribute: COLS NUMBER_LITERAL  */
 #line 346 "parser.y"
-                              { FieldAttributes tmp; init_field_attributes(&tmp); tmp.rows = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2024 "y.tab.c"
+                          { (yyval.field_attrs).cols = (yyvsp[0].num); }
+#line 1997 "y.tab.c"
     break;
 
-  case 40: /* attribute: COLS '=' NUMBER_LITERAL  */
+  case 42: /* attribute: PATTERN STRING_LITERAL  */
 #line 347 "parser.y"
-                              { FieldAttributes tmp; init_field_attributes(&tmp); tmp.cols = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2030 "y.tab.c"
+                             { (yyval.field_attrs).pattern = (yyvsp[0].str); }
+#line 2003 "y.tab.c"
     break;
 
-  case 41: /* attribute: PATTERN '=' STRING_LITERAL  */
+  case 43: /* attribute: DEFAULT STRING_LITERAL  */
 #line 348 "parser.y"
-                                 { FieldAttributes tmp; init_field_attributes(&tmp); tmp.pattern = (yyvsp[0].str); (yyval.field_attrs) = tmp; }
-#line 2036 "y.tab.c"
+                             { (yyval.field_attrs).default_value = (yyvsp[0].str); }
+#line 2009 "y.tab.c"
     break;
 
-  case 42: /* attribute: DEFAULT '=' STRING_LITERAL  */
+  case 44: /* attribute: CONFIRM IDENTIFIER  */
 #line 349 "parser.y"
-                                 { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = (yyvsp[0].str); (yyval.field_attrs) = tmp; }
-#line 2042 "y.tab.c"
+                         { (yyval.field_attrs).confirm_field = (yyvsp[0].str); }
+#line 2015 "y.tab.c"
     break;
 
-  case 43: /* attribute: DEFAULT '=' IDENTIFIER  */
+  case 45: /* attribute: STRENGTH NUMBER_LITERAL  */
 #line 350 "parser.y"
-                             { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = strdup((yyvsp[0].str)); (yyval.field_attrs) = tmp; }
-#line 2048 "y.tab.c"
-    break;
-
-  case 44: /* attribute: STRENGTH '=' NUMBER_LITERAL  */
-#line 351 "parser.y"
-                                  { FieldAttributes tmp; init_field_attributes(&tmp); tmp.strength_required = (yyvsp[0].num); (yyval.field_attrs) = tmp; }
-#line 2054 "y.tab.c"
-    break;
-
-  case 45: /* attribute: CONFIRM '=' IDENTIFIER  */
-#line 352 "parser.y"
-                             { FieldAttributes tmp; init_field_attributes(&tmp); tmp.confirm_field = (yyvsp[0].str); (yyval.field_attrs) = tmp; }
-#line 2060 "y.tab.c"
+                              { (yyval.field_attrs).strength_required = (yyvsp[0].num); }
+#line 2021 "y.tab.c"
     break;
 
   case 46: /* validation_block: VALIDATE '{' validation_rules '}'  */
-#line 360 "parser.y"
+#line 358 "parser.y"
     {
         // Validation block is already processed by the rules
     }
-#line 2068 "y.tab.c"
+#line 2029 "y.tab.c"
     break;
 
   case 49: /* validation_rule: IF condition '{' ERROR STRING_LITERAL ';' '}'  */
-#line 370 "parser.y"
+#line 368 "parser.y"
     {
         ValidationRule* rule = malloc(sizeof(ValidationRule));
         if (!rule) {
@@ -2080,81 +2041,81 @@ yyreduce:
         rule->next = current_form->validation_rules;
         current_form->validation_rules = rule;
     }
-#line 2084 "y.tab.c"
+#line 2045 "y.tab.c"
     break;
 
   case 50: /* condition: IDENTIFIER LT NUMBER_LITERAL  */
-#line 384 "parser.y"
+#line 382 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s < %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2094 "y.tab.c"
+#line 2055 "y.tab.c"
     break;
 
   case 51: /* condition: IDENTIFIER GT NUMBER_LITERAL  */
-#line 390 "parser.y"
+#line 388 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s > %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2104 "y.tab.c"
+#line 2065 "y.tab.c"
     break;
 
   case 52: /* condition: IDENTIFIER LTE NUMBER_LITERAL  */
-#line 396 "parser.y"
+#line 394 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s <= %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2114 "y.tab.c"
+#line 2075 "y.tab.c"
     break;
 
   case 53: /* condition: IDENTIFIER GTE NUMBER_LITERAL  */
-#line 402 "parser.y"
+#line 400 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s >= %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2124 "y.tab.c"
+#line 2085 "y.tab.c"
     break;
 
   case 54: /* condition: IDENTIFIER EQ NUMBER_LITERAL  */
-#line 408 "parser.y"
+#line 406 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s == %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2134 "y.tab.c"
+#line 2095 "y.tab.c"
     break;
 
   case 55: /* condition: IDENTIFIER NEQ NUMBER_LITERAL  */
-#line 414 "parser.y"
+#line 412 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s != %d", (yyvsp[-2].str), (yyvsp[0].num));
         (yyval.validation_rule) = cond;
     }
-#line 2144 "y.tab.c"
+#line 2105 "y.tab.c"
     break;
 
   case 56: /* condition: IDENTIFIER EQ IDENTIFIER  */
-#line 420 "parser.y"
+#line 418 "parser.y"
     {
         char* cond = malloc(50);
         sprintf(cond, "%s == %s", (yyvsp[-2].str), (yyvsp[0].str));
         (yyval.validation_rule) = cond;
     }
-#line 2154 "y.tab.c"
+#line 2115 "y.tab.c"
     break;
 
   case 57: /* metadata_declaration: META IDENTIFIER '=' STRING_LITERAL ';'  */
-#line 428 "parser.y"
+#line 426 "parser.y"
     {
         if (!current_form) {
             yyerror("Metadata must be inside a form");
@@ -2164,11 +2125,11 @@ yyreduce:
         free((yyvsp[-3].str));  // Free the key
         free((yyvsp[-1].str));  // Free the value
     }
-#line 2168 "y.tab.c"
+#line 2129 "y.tab.c"
     break;
 
 
-#line 2172 "y.tab.c"
+#line 2133 "y.tab.c"
 
       default: break;
     }
@@ -2392,7 +2353,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 439 "parser.y"
+#line 437 "parser.y"
 
 
 void yyerror(const char *s) {

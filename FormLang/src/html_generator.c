@@ -100,7 +100,13 @@ void generate_section_html(FILE* output, Section* section) {
             if (field->attributes.rows > 0) fprintf(output, " rows=\"%d\"", field->attributes.rows);
             if (field->attributes.cols > 0) fprintf(output, " cols=\"%d\"", field->attributes.cols);
             if (field->attributes.required) fprintf(output, " required");
-            fprintf(output, "></textarea>\n");
+            fprintf(output, ">");
+            if (field->attributes.default_value) {
+                char* escaped_value = escape_html_attr(field->attributes.default_value);
+                fprintf(output, "%s", escaped_value);
+                free(escaped_value);
+            }
+            fprintf(output, "</textarea>\n");
         } else if (field->type == FIELD_DROPDOWN) {
             fprintf(output, "<select id=\"%s\" name=\"%s\"", field->name, field->name);
             if (field->attributes.required) fprintf(output, " required");
@@ -108,16 +114,22 @@ void generate_section_html(FILE* output, Section* section) {
             if (!field->attributes.required) {
                 fprintf(output, "  <option value=\"\">Select an option</option>\n");
             }
-            fprintf(output, "  <option value=\"option1\">Option 1</option>\n");
-            fprintf(output, "  <option value=\"option2\">Option 2</option>\n");
+            fprintf(output, "  <option value=\"option1\"%s>Option 1</option>\n", 
+                   field->attributes.default_value && strcmp(field->attributes.default_value, "option1") == 0 ? " selected" : "");
+            fprintf(output, "  <option value=\"option2\"%s>Option 2</option>\n",
+                   field->attributes.default_value && strcmp(field->attributes.default_value, "option2") == 0 ? " selected" : "");
             fprintf(output, "</select>\n");
         } else if (field->type == FIELD_RADIO) {
             fprintf(output, "<div class=\"radio-group\">\n");
-            fprintf(output, "  <input type=\"radio\" id=\"%s_1\" name=\"%s\" value=\"option1\"", field->name, field->name);
+            fprintf(output, "  <input type=\"radio\" id=\"%s_1\" name=\"%s\" value=\"option1\"%s", 
+                   field->name, field->name,
+                   field->attributes.default_value && strcmp(field->attributes.default_value, "option1") == 0 ? " checked" : "");
             if (field->attributes.required) fprintf(output, " required");
             fprintf(output, ">\n");
             fprintf(output, "  <span>Option 1</span><br>\n");
-            fprintf(output, "  <input type=\"radio\" id=\"%s_2\" name=\"%s\" value=\"option2\"", field->name, field->name);
+            fprintf(output, "  <input type=\"radio\" id=\"%s_2\" name=\"%s\" value=\"option2\"%s", 
+                   field->name, field->name,
+                   field->attributes.default_value && strcmp(field->attributes.default_value, "option2") == 0 ? " checked" : "");
             if (field->attributes.required) fprintf(output, " required");
             fprintf(output, ">\n");
             fprintf(output, "  <span>Option 2</span>\n");
@@ -140,8 +152,8 @@ void generate_section_html(FILE* output, Section* section) {
             if (field->attributes.min_length > 0) fprintf(output, " minlength=\"%d\"", field->attributes.min_length);
             if (field->attributes.max_length > 0) fprintf(output, " maxlength=\"%d\"", field->attributes.max_length);
             if (field->type == FIELD_NUMBER) {
-                if (field->attributes.min_value != 0) fprintf(output, " min=\"%d\"", field->attributes.min_value);
-                if (field->attributes.max_value != 0) fprintf(output, " max=\"%d\"", field->attributes.max_value);
+                if (field->attributes.min_value != -1) fprintf(output, " min=\"%d\"", field->attributes.min_value);
+                if (field->attributes.max_value != -1) fprintf(output, " max=\"%d\"", field->attributes.max_value);
             }
             if (field->attributes.pattern && strlen(field->attributes.pattern) > 0) {
                 char* escaped_pattern = escape_html_attr(field->attributes.pattern);
@@ -150,11 +162,14 @@ void generate_section_html(FILE* output, Section* section) {
             }
             if (field->attributes.default_value) {
                 char* escaped_value = escape_html_attr(field->attributes.default_value);
-                fprintf(output, " value=\"%s\"", escaped_value);
+                if (field->type == FIELD_CHECKBOX) {
+                    fprintf(output, " %s", strcmp(escaped_value, "true") == 0 ? "checked" : "");
+                } else {
+                    fprintf(output, " value=\"%s\"", escaped_value);
+                }
                 free(escaped_value);
             }
             if (field->type == FIELD_FILE) fprintf(output, " accept=\"*/*\"");
-            if (field->type == FIELD_CHECKBOX && field->attributes.default_value) fprintf(output, " checked");
             if (field->attributes.confirm_field) fprintf(output, " data-confirm=\"%s\"", field->attributes.confirm_field);
             if (field->attributes.strength_required > 0) fprintf(output, " data-strength=\"%d\"", field->attributes.strength_required);
             fprintf(output, ">\n");
@@ -231,7 +246,6 @@ void generate_html(FILE* output) {
 
     fprintf(stderr, "Generating header\n");
     generate_html_header(output);
-    fprintf(output, "<form>\n");
 
     fprintf(stderr, "Processing %d sections\n", current_form->section_count);
     for (int i = 0; i < current_form->section_count; i++) {

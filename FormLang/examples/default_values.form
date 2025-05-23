@@ -1,0 +1,32 @@
+form DefaultValuesTest {
+    section TextFields {
+        field text_default: text default "Hello World" required;
+        field email_default: email default "user@example.com" required;
+        field password_default: password default "P@ssw0rd" required;
+    }
+
+    section NumberFields {
+        field number_default: number default "42" min 0 max 100 required;
+        field decimal_default: number default "3.14" min 0 max 10 required;
+    }
+
+    section TextAreaFields {
+        field textarea_default: textarea default "This is a default textarea value" rows 3 cols 50 required;
+    }
+
+    section DateFields {
+        field date_default: date default "2024-03-20" required;
+    }
+
+    section CheckboxFields {
+        field checkbox_default: checkbox default "true" required;
+    }
+
+    section DropdownFields {
+        field dropdown_default: dropdown default "option2" required;
+    }
+
+    section RadioFields {
+        field radio_default: radio default "option1" required;
+    }
+} 
