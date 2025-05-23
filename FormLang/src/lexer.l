@@ -54,12 +54,14 @@ char* process_string(const char* input) {
 "section"   { return SECTION; }
 "field"     { return FIELD; }
 "validate"  { return VALIDATE; }
+"meta"      { return META; }
 "if"        { return IF; }
 "error"     { return ERROR; }
 ":"         { after_colon = 1; return ':'; }
 ";"         { after_colon = 0; return ';'; }
 "{"         { return '{'; }
 "}"         { return '}'; }
+"="         { return '='; }
 "<"         { return LT; }
 ">"         { return GT; }
 "<="        { return LTE; }

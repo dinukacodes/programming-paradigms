@@ -1,0 +1,20 @@
+form MetaFields {
+    meta author = "Meta Fields";
+    meta version = "3.1";
+    meta description = "Form with metadata and fields.";
+
+    section Personal {
+        field name: text {
+            required;
+        }
+        field age: number {
+            min = 0;
+            max = 120;
+        }
+    }
+    section Contact {
+        field email: email {
+            required;
+        }
+    }
+} 

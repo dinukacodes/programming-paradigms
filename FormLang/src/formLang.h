@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Metadata structure
+typedef struct Metadata {
+    char* key;
+    char* value;
+    struct Metadata* next;
+} Metadata;
+
 // Validation structure
 typedef struct ValidationRule {
     char* condition;
@@ -71,6 +78,7 @@ typedef struct Form {
     Section **sections;
     int section_count;
     ValidationRule* validation_rules;
+    Metadata* metadata;
 } Form;
 
 // External declarations
@@ -90,6 +98,8 @@ void generate_html_header(FILE* output);
 void generate_html_footer(FILE* output);
 void generate_section_html(FILE* output, Section* section);
 void generate_validation_js(FILE* output, Form* form);
+void add_metadata(Form* form, const char* key, const char* value);
+void cleanup_metadata(Metadata* metadata);
 
 // Helper functions
 Form* create_form(const char* name);

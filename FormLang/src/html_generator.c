@@ -6,18 +6,28 @@
 
 void generate_html_header(FILE* output) {
     fprintf(output, "<!DOCTYPE html>\n<html>\n<head>\n");
-    fprintf(output, "<style>\n");
-    fprintf(output, "body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\n");
-    fprintf(output, "form { background: #f5f5f5; padding: 20px; border-radius: 5px; }\n");
-    fprintf(output, "section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }\n");
-    fprintf(output, "h2 { color: #333; margin-top: 0; }\n");
-    fprintf(output, "label { display: block; margin-bottom: 5px; }\n");
-    fprintf(output, "input, textarea, select { width: 100%%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }\n");
-    fprintf(output, "input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }\n");
-    fprintf(output, "input[type=submit]:hover { background: #45a049; }\n");
-    fprintf(output, ".radio-group { margin-bottom: 10px; }\n");
-    fprintf(output, ".radio-group label { display: inline; margin-left: 5px; }\n");
-    fprintf(output, "</style>\n</head>\n<body>\n");
+    fprintf(output, "  <meta charset=\"UTF-8\">\n");
+    fprintf(output, "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
+    fprintf(output, "  <title>%s</title>\n", current_form->name);
+    
+    // Add metadata as HTML comments
+    Metadata* meta = current_form->metadata;
+    while (meta) {
+        fprintf(output, "  <!-- %s: %s -->\n", meta->key, meta->value);
+        meta = meta->next;
+    }
+    
+    fprintf(output, "  <style>\n");
+    fprintf(output, "    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\n");
+    fprintf(output, "    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }\n");
+    fprintf(output, "    legend { font-weight: bold; padding: 0 10px; }\n");
+    fprintf(output, "    .field { margin-bottom: 15px; }\n");
+    fprintf(output, "    label { display: block; margin-bottom: 5px; }\n");
+    fprintf(output, "    input, textarea, select { width: 100%%; padding: 8px; margin-bottom: 5px; }\n");
+    fprintf(output, "    .error { color: red; font-size: 0.9em; margin-top: 5px; }\n");
+    fprintf(output, "  </style>\n");
+    fprintf(output, "</head>\n<body>\n");
+    fprintf(output, "<form id=\"%s\" onsubmit=\"return validateForm()\">\n", current_form->name);
 }
 
 void generate_html_footer(FILE* output) {

@@ -2190,7 +2190,7 @@ yyexhaustedlab:
   yyerror (YY_("memory exhausted"));
   yyresult = 2;
   goto yyreturnlab;
-
+  
 
 /*----------------------------------------------------------.
 | yyreturnlab -- parsing is finished, clean up and return.  |

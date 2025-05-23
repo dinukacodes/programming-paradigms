@@ -1,0 +1,12 @@
+form MetaEdge {
+    meta author = "";
+    meta version = "4.0-beta";
+    meta description = "This is a very long description that should still be handled correctly by the parser and generator. 这是一个测试。";
+    meta unicode = "测试";
+
+    section Dummy {
+        field dummy: text {
+            required;
+        }
+    }
+} 

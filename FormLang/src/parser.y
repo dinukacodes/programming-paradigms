@@ -29,6 +29,7 @@ Form* create_form(const char* name) {
     form->sections = NULL;
     form->section_count = 0;
     form->validation_rules = NULL;
+    form->metadata = NULL;
     return form;
 }
 
@@ -128,6 +129,28 @@ void add_field_to_section(Section* section, const char* name, FieldType type, Fi
     section->field_count++;
 }
 
+void add_metadata(Form* form, const char* key, const char* value) {
+    Metadata* meta = malloc(sizeof(Metadata));
+    if (!meta) {
+        fprintf(stderr, "Memory allocation failed for metadata\n");
+        return;
+    }
+    meta->key = strdup(key);
+    meta->value = strdup(value);
+    meta->next = form->metadata;
+    form->metadata = meta;
+}
+
+void cleanup_metadata(Metadata* metadata) {
+    while (metadata) {
+        Metadata* next = metadata->next;
+        if (metadata->key) free(metadata->key);
+        if (metadata->value) free(metadata->value);
+        free(metadata);
+        metadata = next;
+    }
+}
+
 void cleanup_form(Form* form) {
     if (form) {
         for (int i = 0; i < form->section_count; i++) {
@@ -157,6 +180,9 @@ void cleanup_form(Form* form) {
             rule = next;
         }
         
+        // Cleanup metadata
+        cleanup_metadata(form->metadata);
+        
         free(form);
     }
     
@@ -167,10 +193,22 @@ void cleanup_form(Form* form) {
     if (field_names) free(field_names);
     field_name_count = 0;
 }
+
+void merge_field_attributes(FieldAttributes* dest, FieldAttributes* src) {
+    if (src->required != -1) dest->required = src->required;
+    if (src->min_length != -1) dest->min_length = src->min_length;
+    if (src->max_length != -1) dest->max_length = src->max_length;
+    if (src->min_value != -1) dest->min_value = src->min_value;
+    if (src->max_value != -1) dest->max_value = src->max_value;
+    if (src->rows != -1) dest->rows = src->rows;
+    if (src->cols != -1) dest->cols = src->cols;
+    if (src->pattern) { if (dest->pattern) free(dest->pattern); dest->pattern = strdup(src->pattern); }
+    if (src->default_value) { if (dest->default_value) free(dest->default_value); dest->default_value = strdup(src->default_value); }
+}
 %}
 
 %token FORM SECTION FIELD TEXT EMAIL PASSWORD NUMBER TEXTAREA DATE CHECKBOX DROPDOWN RADIO FILE_TYPE USERNAME ADDRESS
-%token REQUIRED OPTIONAL MINLENGTH MAXLENGTH MIN MAX ROWS COLS PATTERN DEFAULT CONFIRM STRENGTH
+%token REQUIRED OPTIONAL MINLENGTH MAXLENGTH MIN MAX ROWS COLS PATTERN DEFAULT CONFIRM STRENGTH META
 %token IDENTIFIER NUMBER_LITERAL STRING_LITERAL
 %token VALIDATE IF ERROR LT GT LTE GTE EQ NEQ AND OR
 
@@ -188,23 +226,19 @@ void cleanup_form(Form* form) {
 %type <num> NUMBER_LITERAL
 %type <form> form
 %type <field_type> field_type
-%type <field_attrs> field_attributes attribute
+%type <field_attrs> field_attributes attribute attribute_opt_semicolon
 %type <validation_rule> validation_block validation_rule condition
 
 %define parse.error verbose
 
 %%
 
-form: FORM IDENTIFIER 
+form: FORM IDENTIFIER '{' { current_form = create_form($2); } form_body '}'
     {
-        current_form = create_form($2);
         if (!current_form) {
             yyerror("Failed to create form");
             YYERROR;
         }
-    }
-    '{' form_body '}'
-    {
         generate_html(stdout);
         $$ = current_form;
     }
@@ -217,21 +251,19 @@ form_body:
 form_item:
       section
     | validation_block
+    | metadata_declaration
     ;
 
 section_list: 
     | section_list section
     ;
 
-section: section_header '{' field_list '}'
+section: SECTION IDENTIFIER '{' { current_section = create_section($2); } field_list '}' { add_section_to_form(current_form, current_section); current_section = NULL; }
+    | SECTION IDENTIFIER '{' '}'
     {
         current_section = NULL;
     }
-    | section_header '{' '}'
-    {
-        current_section = NULL;
-    }
-    | section_header error '}'
+    | SECTION IDENTIFIER error '}'
     {
         yyerror("Invalid section declaration");
         current_section = NULL;
@@ -256,7 +288,7 @@ section_header: SECTION IDENTIFIER
     ;
 
 field_list:
-    | field_list field
+    | field_list field_declaration
     | field_list error ';'
     {
         yyerror("Invalid field declaration");
@@ -265,7 +297,7 @@ field_list:
     }
     ;
 
-field: FIELD IDENTIFIER ':' field_type field_attributes ';'
+field_declaration: FIELD IDENTIFIER ':' field_type '{' field_attributes '}'
     {
         if (current_section == NULL) {
             yyerror("Field must be inside a section");
@@ -275,7 +307,7 @@ field: FIELD IDENTIFIER ':' field_type field_attributes ';'
             yyerror("Duplicate field name found");
             YYERROR;
         }
-        add_field_to_section(current_section, $2, $4, &$5);
+        add_field_to_section(current_section, $2, $4, &$6);
         free($2); // Free the field name
     }
     ;
@@ -294,98 +326,30 @@ field_type: TEXT     { $$ = FIELD_TEXT; }
           | ADDRESS  { $$ = FIELD_ADDRESS; }
           ;
 
-field_attributes: /* empty */
-    {
-        init_field_attributes(&$$);
-    }
-    | field_attributes attribute
-    {
-        // Merge attributes
-        if ($2.required != -1) $$.required = $2.required;
-        if ($2.min_length != -1) $$.min_length = $2.min_length;
-        if ($2.max_length != -1) $$.max_length = $2.max_length;
-        if ($2.min_value != -1) $$.min_value = $2.min_value;
-        if ($2.max_value != -1) $$.max_value = $2.max_value;
-        if ($2.rows != -1) $$.rows = $2.rows;
-        if ($2.cols != -1) $$.cols = $2.cols;
-        if ($2.pattern) {
-            if ($$.pattern) free($$.pattern);
-            $$.pattern = $2.pattern;
-        }
-        if ($2.default_value) {
-            if ($$.default_value) free($$.default_value);
-            $$.default_value = $2.default_value;
-        }
-    }
+field_attributes:
+      /* empty */ { init_field_attributes(&$$); }
+    | field_attributes attribute_opt_semicolon { $$ = $1; merge_field_attributes(&$$, &$2); }
     ;
 
-attribute: REQUIRED
-    {
-        init_field_attributes(&$$);
-        $$.required = 1;
-    }
-    | OPTIONAL
-    {
-        init_field_attributes(&$$);
-        $$.required = 0;
-    }
-    | PATTERN STRING_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.pattern = $2;
-    }
-    | DEFAULT STRING_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.default_value = $2;
-    }
-    | DEFAULT NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        char buf[32];
-        sprintf(buf, "%d", $2);
-        $$.default_value = strdup(buf);
-    }
-    | MINLENGTH NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.min_length = $2;
-    }
-    | MAXLENGTH NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.max_length = $2;
-    }
-    | MIN NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.min_value = $2;
-    }
-    | MAX NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.max_value = $2;
-    }
-    | ROWS NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.rows = $2;
-    }
-    | COLS NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.cols = $2;
-    }
-    | CONFIRM IDENTIFIER
-    {
-        init_field_attributes(&$$);
-        $$.confirm_field = $2;
-    }
-    | STRENGTH NUMBER_LITERAL
-    {
-        init_field_attributes(&$$);
-        $$.strength_required = $2;
-    }
+attribute_opt_semicolon:
+      attribute ';' { $$ = $1; }
+    | attribute     { $$ = $1; }
+    ;
+
+attribute:
+      REQUIRED    { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 1; $$ = tmp; }
+    | OPTIONAL    { FieldAttributes tmp; init_field_attributes(&tmp); tmp.required = 0; $$ = tmp; }
+    | MINLENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_length = $3; $$ = tmp; }
+    | MAXLENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_length = $3; $$ = tmp; }
+    | MIN '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.min_value = $3; $$ = tmp; }
+    | MAX '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.max_value = $3; $$ = tmp; }
+    | ROWS '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.rows = $3; $$ = tmp; }
+    | COLS '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.cols = $3; $$ = tmp; }
+    | PATTERN '=' STRING_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.pattern = $3; $$ = tmp; }
+    | DEFAULT '=' STRING_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = $3; $$ = tmp; }
+    | DEFAULT '=' IDENTIFIER { FieldAttributes tmp; init_field_attributes(&tmp); tmp.default_value = strdup($3); $$ = tmp; }
+    | STRENGTH '=' NUMBER_LITERAL { FieldAttributes tmp; init_field_attributes(&tmp); tmp.strength_required = $3; $$ = tmp; }
+    | CONFIRM '=' IDENTIFIER { FieldAttributes tmp; init_field_attributes(&tmp); tmp.confirm_field = $3; $$ = tmp; }
     ;
 
 validation_blocks:
@@ -393,6 +357,9 @@ validation_blocks:
     ;
 
 validation_block: VALIDATE '{' validation_rules '}'
+    {
+        // Validation block is already processed by the rules
+    }
     ;
 
 validation_rules:
@@ -402,6 +369,10 @@ validation_rules:
 validation_rule: IF condition '{' ERROR STRING_LITERAL ';' '}'
     {
         ValidationRule* rule = malloc(sizeof(ValidationRule));
+        if (!rule) {
+            yyerror("Memory allocation failed for validation rule");
+            YYERROR;
+        }
         rule->condition = $2;
         rule->error_message = $5;
         rule->next = current_form->validation_rules;
@@ -444,6 +415,24 @@ condition: IDENTIFIER LT NUMBER_LITERAL
         char* cond = malloc(50);
         sprintf(cond, "%s != %d", $1, $3);
         $$ = cond;
+    }
+    | IDENTIFIER EQ IDENTIFIER
+    {
+        char* cond = malloc(50);
+        sprintf(cond, "%s == %s", $1, $3);
+        $$ = cond;
+    }
+    ;
+
+metadata_declaration: META IDENTIFIER '=' STRING_LITERAL ';'
+    {
+        if (!current_form) {
+            yyerror("Metadata must be inside a form");
+            YYERROR;
+        }
+        add_metadata(current_form, $2, $4);
+        free($2);  // Free the key
+        free($4);  // Free the value
     }
     ;
 

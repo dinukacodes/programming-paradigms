@@ -81,20 +81,21 @@ extern int yydebug;
     DEFAULT = 282,                 /* DEFAULT  */
     CONFIRM = 283,                 /* CONFIRM  */
     STRENGTH = 284,                /* STRENGTH  */
-    IDENTIFIER = 285,              /* IDENTIFIER  */
-    NUMBER_LITERAL = 286,          /* NUMBER_LITERAL  */
-    STRING_LITERAL = 287,          /* STRING_LITERAL  */
-    VALIDATE = 288,                /* VALIDATE  */
-    IF = 289,                      /* IF  */
-    ERROR = 290,                   /* ERROR  */
-    LT = 291,                      /* LT  */
-    GT = 292,                      /* GT  */
-    LTE = 293,                     /* LTE  */
-    GTE = 294,                     /* GTE  */
-    EQ = 295,                      /* EQ  */
-    NEQ = 296,                     /* NEQ  */
-    AND = 297,                     /* AND  */
-    OR = 298                       /* OR  */
+    META = 285,                    /* META  */
+    IDENTIFIER = 286,              /* IDENTIFIER  */
+    NUMBER_LITERAL = 287,          /* NUMBER_LITERAL  */
+    STRING_LITERAL = 288,          /* STRING_LITERAL  */
+    VALIDATE = 289,                /* VALIDATE  */
+    IF = 290,                      /* IF  */
+    ERROR = 291,                   /* ERROR  */
+    LT = 292,                      /* LT  */
+    GT = 293,                      /* GT  */
+    LTE = 294,                     /* LTE  */
+    GTE = 295,                     /* GTE  */
+    EQ = 296,                      /* EQ  */
+    NEQ = 297,                     /* NEQ  */
+    AND = 298,                     /* AND  */
+    OR = 299                       /* OR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -130,26 +131,27 @@ extern int yydebug;
 #define DEFAULT 282
 #define CONFIRM 283
 #define STRENGTH 284
-#define IDENTIFIER 285
-#define NUMBER_LITERAL 286
-#define STRING_LITERAL 287
-#define VALIDATE 288
-#define IF 289
-#define ERROR 290
-#define LT 291
-#define GT 292
-#define LTE 293
-#define GTE 294
-#define EQ 295
-#define NEQ 296
-#define AND 297
-#define OR 298
+#define META 285
+#define IDENTIFIER 286
+#define NUMBER_LITERAL 287
+#define STRING_LITERAL 288
+#define VALIDATE 289
+#define IF 290
+#define ERROR 291
+#define LT 292
+#define GT 293
+#define LTE 294
+#define GTE 295
+#define EQ 296
+#define NEQ 297
+#define AND 298
+#define OR 299
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 177 "parser.y"
+#line 215 "parser.y"
 
     char* str;
     int num;
@@ -159,7 +161,7 @@ union YYSTYPE
     FieldAttributes field_attrs;
     ValidationRule* validation_rule;
 
-#line 163 "y.tab.h"
+#line 165 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

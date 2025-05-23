@@ -1,0 +1,5 @@
+form MetaOnly {
+    meta author = "Meta Tester";
+    meta version = "2.0";
+    meta description = "Form with only metadata, no sections.";
+} 

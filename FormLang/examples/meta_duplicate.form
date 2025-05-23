@@ -1,0 +1,11 @@
+form MetaDuplicate {
+    meta author = "First Author";
+    meta author = "Second Author";
+    meta version = "5.0";
+
+    section Test {
+        field test: text {
+            required;
+        }
+    }
+} 

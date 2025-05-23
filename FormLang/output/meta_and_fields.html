@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFields</title>
+  <!-- description: Form with metadata and fields. -->
+  <!-- version: 3.1 -->
+  <!-- author: Meta Fields -->
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="MetaFields" onsubmit="return validateForm()">
+<form>
+<section>
+<h2>Personal</h2>
+<label for="name">name *</label>
+<input type="text" id="name" name="name" required>
+<label for="age">age</label>
+<input type="number" id="age" name="age" max="120">
+</section>
+<section>
+<h2>Contact</h2>
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required>
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>
