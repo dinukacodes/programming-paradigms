@@ -1,6 +1,6 @@
 # FormLang Usage Guide
 
-This guide explains how to create and process your own form definitions using FormLang.
+
 
 ## Creating Form Files
 

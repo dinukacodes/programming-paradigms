@@ -1,6 +1,0 @@
-form Duplicate {
-  section Test {
-    field test: text required;
-    field test: text required;
-  }
-}

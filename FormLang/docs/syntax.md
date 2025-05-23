@@ -2,7 +2,7 @@
 
 ## Metadata Declarations
 
-Metadata allows you to attach key-value information to a form. Metadata is declared at the top level of a form, before any sections or fields. Each metadata entry uses the `meta` keyword, a key, an equals sign, and a string value, ending with a semicolon.
+Metadata: key-value info for a form. Metadata is declared at the top level of a form, before any sections or fields. Each metadata entry uses the `meta` keyword, a key, an equals sign, and a string value, ending with a semicolon.
 
 **Syntax:**
 

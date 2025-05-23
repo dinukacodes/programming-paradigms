@@ -1,6 +1,5 @@
 # FormLang++ Project Documentation
 
-This document provides an overview of the directory structure, purpose of each file and directory within the `FormLang` project directory (excluding `examples` and `output`), and a brief explanation of the code in the source files. 
 
 ## Directory Structure
 

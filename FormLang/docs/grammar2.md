@@ -1,6 +1,6 @@
 # FormLang++ Grammar Specification
 
-This document provides a clear, concise, and detailed specification of the FormLang++ DSL grammar, based on the EBNF definition.
+Grammar notes and examples.
 
 ## Core Grammar Rules
 
@@ -68,54 +68,54 @@ character = (* any character except double quote *) ;
 ## Grammar Notes
 
 1.  **Form Structure**
-    -   Each form must have a unique identifier
-    -   Forms can contain multiple metadata declarations
-    -   Forms must contain at least one section
-    -   Sections must contain at least one field
+    -   Forms need a unique id.
+    -   Can have multiple metadata.
+    -   Need at least one section.
+    -   Sections need at least one field.
 
 2.  **Metadata**
-    -   Metadata declarations must appear before any sections
-    -   Each metadata entry must have a unique key
-    -   Values must be string literals
+    -   Meta goes before sections.
+    -   Each meta entry needs a unique key.
+    -   Values must be strings.
 
 3.  **Sections**
-    -   Each section must have a unique identifier within its form
-    -   Sections can contain multiple fields
-    -   Field identifiers must be unique within their section
+    -   Sections need unique ids within a form.
+    -   Can have multiple fields.
+    -   Field ids unique within a section.
 
 4.  **Fields**
-    -   Each field must have a type and at least one attribute
-    -   Field types determine which attributes are valid
-    -   Some attributes are mutually exclusive (e.g., required/optional)
+    -   Each field needs a type and at least one attribute.
+    -   Attributes depend on type.
+    -   Some attributes can't be used together (e.g., required/optional).
 
 5.  **Validation**
-    -   Validation blocks can reference any field in the form
-    -   Conditions can compare fields to literals or other fields
-    -   Error messages must be string literals
+    -   Validation blocks can reference any field.
+    -   Conditions compare fields or literals.
+    -   Error messages must be strings.
 
 ## Field Type-Specific Rules
 
 1.  **Text Fields** (text, email, password)
-    -   Support: pattern, minLength, maxLength, default
-    -   Email fields must contain a valid email pattern
-    -   Password fields should not have default values
+    -   Supports: pattern, minLength, maxLength, default.
+    -   Emails need valid pattern.
+    -   Passwords shouldn't have default values.
 
 2.  **Numeric Fields** (number)
-    -   Support: min, max, default
-    -   Default values must be numbers
+    -   Supports: min, max, default.
+    -   Default values are numbers.
 
 3.  **Text Area** (textarea)
-    -   Support: rows, cols, default
-    -   Default values must be strings
+    -   Supports: rows, cols, default.
+    -   Default values are strings.
 
 4.  **Selection Fields** (dropdown, radio)
-    -   Must have an options attribute
-    -   Options must be non-empty string arrays
-    -   Support: default (must match an option)
+    -   Need options attribute.
+    -   Options are non-empty string arrays.
+    -   Default must match an option.
 
 5.  **File Fields** (file)
-    -   Support: pattern (for file type restrictions)
-    -   No default values allowed
+    -   Supports: pattern (for file types).
+    -   No default values.
 
 ## Examples
 
