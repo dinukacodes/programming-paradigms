@@ -1,0 +1,38 @@
+Parser Error: Duplicate field name at line 11
+Parser Error: Invalid field declaration at line 14
+Parser Error: Duplicate field name at line 19
+Parser Error: Invalid field declaration at line 28
+Starting HTML generation
+Generating header
+Processing 3 sections
+Generating section 0
+Starting section generation
+Processing 1 fields
+Generating field 0
+Field 0 generated successfully
+Section generation complete
+Generating section 1
+Starting section generation
+Generating section 2
+Starting section generation
+Processing 9 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Generating field 4
+Field 4 generated successfully
+Generating field 5
+Field 5 generated successfully
+Generating field 6
+Field 6 generated successfully
+Generating field 7
+Field 7 generated successfully
+Generating field 8
+Field 8 generated successfully
+Section generation complete
+HTML generation complete

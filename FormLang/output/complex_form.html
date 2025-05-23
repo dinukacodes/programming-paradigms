@@ -16,11 +16,14 @@
 </head>
 <body>
 <form id="ComplexForm" onsubmit="return validateForm()">
-<form>
 <section>
 <h2>PersonalInfo</h2>
+<label for="full_name">full_name</label>
+<input type="text" id="full_name" name="full_name" minlength="5" maxlength="25581">
 <label for="birth_date">birth_date *</label>
-<input type="date" id="birth_date" name="birth_date" required>
+<input type="date" id="birth_date" name="birth_date" required maxlength="25581">
+<label for="age">age</label>
+<input type="number" id="age" name="age" maxlength="25581" min="18" max="0">
 <label for="gender">gender *</label>
 <div class="radio-group">
   <input type="radio" id="gender_1" name="gender" value="option1" required>
@@ -32,7 +35,20 @@
 <section>
 <h2>ContactInfo</h2>
 <label for="email">email *</label>
-<input type="email" id="email" name="email" required>
+<input type="email" id="email" name="email" required maxlength="25581">
+<label for="phone">phone</label>
+<input type="text" id="phone" name="phone" maxlength="25581" pattern="^[0-9]{10}$">
+<label for="address">address</label>
+<textarea id="address" name="address" rows="3"></textarea>
+</section>
+<section>
+<h2>AccountInfo</h2>
+<label for="username">username</label>
+<input type="text" id="username" name="username" minlength="5" maxlength="25581">
+<label for="password">password</label>
+<input type="password" id="password" name="password" minlength="8" maxlength="25581">
+<label for="confirm_password">confirm_password</label>
+<input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="25581">
 </section>
 <section>
 <h2>Preferences</h2>
@@ -41,8 +57,10 @@
   <option value="option1">Option 1</option>
   <option value="option2">Option 2</option>
 </select>
+<label for="bio">bio</label>
+<textarea id="bio" name="bio" rows="5"></textarea>
 <label for="avatar">avatar</label>
-<input type="file" id="avatar" name="avatar" accept="*/*">
+<input type="file" id="avatar" name="avatar" maxlength="25581" accept="*/*">
 </section>
 <input type="submit" value="Submit">
 </form>

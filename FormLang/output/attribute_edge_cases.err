@@ -1,0 +1,65 @@
+Syntax error at line 17: Unexpected character
+Parser Error: syntax error, unexpected invalid token, expecting NUMBER_LITERAL at line 17
+Syntax error at line 17: Unexpected character
+Parser Error: Invalid field declaration at line 17
+Parser Error: syntax error, unexpected NUMBER_LITERAL, expecting STRING_LITERAL at line 27
+Parser Error: Invalid field declaration at line 27
+Syntax error at line 28: Unexpected character
+Parser Error: syntax error, unexpected invalid token, expecting STRING_LITERAL at line 28
+Parser Error: Invalid field declaration at line 28
+Starting HTML generation
+Generating header
+Processing 5 sections
+Generating section 0
+Starting section generation
+Processing 4 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Section generation complete
+Generating section 1
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 2
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 3
+Starting section generation
+Processing 4 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Section generation complete
+Generating section 4
+Starting section generation
+Processing 2 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Section generation complete
+HTML generation complete

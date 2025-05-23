@@ -1,0 +1,7 @@
+form BasicFormTest {
+    section UserInfo {
+        field name: text required;
+        field email: email required;
+        field age: number optional;
+    }
+} 

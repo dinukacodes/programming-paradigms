@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComprehensiveDemo</title>
+  <!-- description: A comprehensive demonstration of all FormLang++ features -->
+  <!-- version: 1.0 -->
+  <!-- author: SE2062 Team -->
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="ComprehensiveDemo" onsubmit="return validateForm()">
+<section>
+<h2>PersonalInfo</h2>
+<label for="name">name *</label>
+<input type="text" id="name" name="name" required maxlength="25392">
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required maxlength="25392">
+<label for="age">age *</label>
+<input type="number" id="age" name="age" required maxlength="25392" min="0" max="0">
+<label for="birthDate">birthDate *</label>
+<input type="date" id="birthDate" name="birthDate" required maxlength="25392">
+<label for="gender">gender *</label>
+<div class="radio-group">
+  <input type="radio" id="gender_1" name="gender" value="option1" required>
+  <span>Option 1</span><br>
+  <input type="radio" id="gender_2" name="gender" value="option2" required>
+  <span>Option 2</span>
+</div>
+</section>
+<section>
+<h2>AccountInfo</h2>
+<label for="username">username *</label>
+<input type="text" id="username" name="username" required maxlength="25392" data-confirm="gender" data-strength="12">
+<label for="password">password *</label>
+<input type="password" id="password" name="password" required maxlength="25392">
+<label for="confirmPassword">confirmPassword *</label>
+<input type="password" id="confirmPassword" name="confirmPassword" required maxlength="25392">
+<label for="subscriptionType">subscriptionType *</label>
+<select id="subscriptionType" name="subscriptionType" required>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+</select>
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    {
+      var age = document.getElementById('age');
+      var ageVal = age ? age.value : '';
+      if (age && ageVal !== '' && parseFloat(ageVal) < 18) {
+        errors.push("You must be at least 18 years old.");
+        valid = false;
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

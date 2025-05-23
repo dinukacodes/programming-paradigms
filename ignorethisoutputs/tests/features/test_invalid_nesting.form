@@ -1,0 +1,7 @@
+form InvalidNesting {
+  section Outer {
+    section Inner {
+      field test: text required;
+    }
+  }
+}

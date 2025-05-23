@@ -1,0 +1,29 @@
+form AllowDenyFieldTest {
+    section AllowDenyTests {
+        field basic_allowdeny: allow_deny required;
+        
+        field access_permission: allow_deny {
+            required;
+            default = false;
+        }
+        
+        field resource_permission: allow_deny {
+            optional;
+            default = false;
+        }
+        
+        field feature_permission: allow_deny {
+            required;
+            default = false;
+        }
+    }
+
+    validate {
+        if basic_allowdeny == 0 { error "Allow/Deny selection is required."; }
+        
+        if access_permission == 0 { error "Access permission is required."; }
+        if !access_permission { error "Access must be allowed."; }
+        
+        if feature_permission == 0 { error "Feature permission is required."; }
+    }
+} 

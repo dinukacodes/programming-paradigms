@@ -1,0 +1,17 @@
+form NestedSectionTest {
+    section PersonalInfo {
+        field name: text required;
+        field email: email required;
+        
+        section Address {
+            field street: text required;
+            field city: text required;
+            field zip: number required;
+        }
+        
+        section Contact {
+            field phone: text required;
+            field mobile: text optional;
+        }
+    }
+} 

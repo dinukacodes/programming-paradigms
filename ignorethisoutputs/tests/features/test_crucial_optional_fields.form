@@ -1,0 +1,29 @@
+form CrucialOptionalFieldTest {
+    section CrucialOptionalTests {
+        field basic_crucialoptional: crucial_optional required;
+        
+        field field_crucial: crucial_optional {
+            required;
+            default = true;
+        }
+        
+        field section_crucial: crucial_optional {
+            optional;
+            default = false;
+        }
+        
+        field group_crucial: crucial_optional {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_crucialoptional == 0 { error "Crucial/Optional selection is required."; }
+        
+        if field_crucial == 0 { error "Field crucial status is required."; }
+        if !field_crucial { error "Field must be crucial."; }
+        
+        if group_crucial == 0 { error "Group crucial status is required."; }
+    }
+} 

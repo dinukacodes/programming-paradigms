@@ -1,0 +1,12 @@
+Parser Error: syntax error, unexpected IDENTIFIER at line 3
+Parser Error: Invalid field declaration at line 3
+Starting HTML generation
+Generating header
+Processing 1 sections
+Generating section 0
+Starting section generation
+Processing 1 fields
+Generating field 0
+Field 0 generated successfully
+Section generation complete
+HTML generation complete

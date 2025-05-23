@@ -1,0 +1,29 @@
+form ApproveRejectFieldTest {
+    section ApproveRejectTests {
+        field basic_approvereject: approve_reject required;
+        
+        field application_approval: approve_reject {
+            required;
+            default = false;
+        }
+        
+        field document_approval: approve_reject {
+            optional;
+            default = false;
+        }
+        
+        field request_approval: approve_reject {
+            required;
+            default = false;
+        }
+    }
+
+    validate {
+        if basic_approvereject == 0 { error "Approve/Reject selection is required."; }
+        
+        if application_approval == 0 { error "Application approval is required."; }
+        if !application_approval { error "Application must be approved."; }
+        
+        if request_approval == 0 { error "Request approval is required."; }
+    }
+} 

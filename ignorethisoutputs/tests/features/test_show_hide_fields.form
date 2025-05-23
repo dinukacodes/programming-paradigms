@@ -1,0 +1,29 @@
+form ShowHideFieldTest {
+    section ShowHideTests {
+        field basic_showhide: show_hide required;
+        
+        field element_visibility: show_hide {
+            required;
+            default = true;
+        }
+        
+        field section_visibility: show_hide {
+            optional;
+            default = false;
+        }
+        
+        field component_visibility: show_hide {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_showhide == 0 { error "Show/Hide selection is required."; }
+        
+        if element_visibility == 0 { error "Element visibility is required."; }
+        if !element_visibility { error "Element must be shown."; }
+        
+        if component_visibility == 0 { error "Component visibility is required."; }
+    }
+} 

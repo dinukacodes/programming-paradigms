@@ -1,0 +1,33 @@
+form PercentageFieldTest {
+    section PercentageTests {
+        field basic_percentage: percentage required;
+        
+        field tax_rate: percentage {
+            required;
+            default = "7.5%";
+        }
+        
+        field discount_rate: percentage {
+            optional;
+            default = "10.0%";
+        }
+        
+        field interest_rate: percentage {
+            required;
+            default = "3.25%";
+        }
+    }
+
+    validate {
+        if basic_percentage == 0 { error "Percentage is required."; }
+        if !basic_percentage.matches("^[0-9]+(\\.[0-9]+)?%$") { error "Invalid percentage format."; }
+        
+        if tax_rate == 0 { error "Tax rate is required."; }
+        if !tax_rate.matches("^[0-9]+(\\.[0-9]+)?%$") { error "Invalid tax rate format."; }
+        
+        if discount_rate != 0 && !discount_rate.matches("^[0-9]+(\\.[0-9]+)?%$") { error "Invalid discount rate format."; }
+        
+        if interest_rate == 0 { error "Interest rate is required."; }
+        if !interest_rate.matches("^[0-9]+(\\.[0-9]+)?%$") { error "Invalid interest rate format."; }
+    }
+} 

@@ -1,0 +1,29 @@
+form PremierOptionalFieldTest {
+    section PremierOptionalTests {
+        field basic_premieroptional: premier_optional required;
+        
+        field field_premier: premier_optional {
+            required;
+            default = true;
+        }
+        
+        field section_premier: premier_optional {
+            optional;
+            default = false;
+        }
+        
+        field group_premier: premier_optional {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_premieroptional == 0 { error "Premier/Optional selection is required."; }
+        
+        if field_premier == 0 { error "Field premier status is required."; }
+        if !field_premier { error "Field must be premier."; }
+        
+        if group_premier == 0 { error "Group premier status is required."; }
+    }
+} 

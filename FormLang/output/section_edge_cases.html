@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SectionEdgeCases</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="SectionEdgeCases" onsubmit="return validateForm()">
+<section>
+<h2>SingleFieldSection</h2>
+<label for="test">test *</label>
+<input type="text" id="test" name="test" required maxlength="22409">
+</section>
+<section>
+<h2>VeryLongSectionNameThatExceedsNormalLengthButShouldStillWorkProperly</h2>
+<label for="email_field">email_field *</label>
+<input type="email" id="email_field" name="email_field" required maxlength="22409">
+<label for="password_field">password_field *</label>
+<input type="password" id="password_field" name="password_field" required maxlength="22409">
+<label for="number_field">number_field *</label>
+<input type="number" id="number_field" name="number_field" required maxlength="22409" min="0" max="0">
+<label for="textarea_field">textarea_field *</label>
+<textarea id="textarea_field" name="textarea_field" required></textarea>
+<label for="date_field">date_field *</label>
+<input type="date" id="date_field" name="date_field" required maxlength="22409">
+<label for="checkbox_field">checkbox_field *</label>
+<input type="checkbox" id="checkbox_field" name="checkbox_field" required maxlength="22409">
+<label for="radio_field">radio_field *</label>
+<div class="radio-group">
+  <input type="radio" id="radio_field_1" name="radio_field" value="option1" required>
+  <span>Option 1</span><br>
+  <input type="radio" id="radio_field_2" name="radio_field" value="option2" required>
+  <span>Option 2</span>
+</div>
+<label for="dropdown_field">dropdown_field *</label>
+<select id="dropdown_field" name="dropdown_field" required>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+</select>
+<label for="file_field">file_field *</label>
+<input type="file" id="file_field" name="file_field" required maxlength="22409" accept="*/*">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

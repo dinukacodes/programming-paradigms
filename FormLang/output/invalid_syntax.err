@@ -1,0 +1,12 @@
+Parser Error: syntax error, unexpected ';', expecting ':' at line 3
+Parser Error: Invalid field declaration at line 3
+Parser Error: syntax error, unexpected IDENTIFIER, expecting ':' at line 4
+Parser Error: Invalid field declaration at line 4
+Parser Error: syntax error, unexpected STRING_LITERAL, expecting NUMBER_LITERAL at line 5
+Parser Error: Invalid field declaration at line 5
+Starting HTML generation
+Generating header
+Processing 1 sections
+Generating section 0
+Starting section generation
+HTML generation complete

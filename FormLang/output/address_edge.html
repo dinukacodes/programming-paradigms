@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-form { background: #f5f5f5; padding: 20px; border-radius: 5px; }
-section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }
-h2 { color: #333; margin-top: 0; }
-label { display: block; margin-bottom: 5px; }
-input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
-input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
-input[type=submit]:hover { background: #45a049; }
-.radio-group { margin-bottom: 10px; }
-.radio-group label { display: inline; margin-left: 5px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AddressEdge</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
 </head>
 <body>
-<form>
+<form id="AddressEdge" onsubmit="return validateForm()">
 <section>
 <h2>Addr</h2>
 <label for="address">address *</label>
@@ -34,62 +34,14 @@ input[type=submit]:hover { background: #45a049; }
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
-  const errorDiv = document.createElement('div');
-  errorDiv.style.color = 'red';
-  errorDiv.style.marginBottom = '10px';
-  form.insertBefore(errorDiv, form.firstChild);
-
-  function checkPasswordStrength(password) {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return strength;
-  }
-
-  const passwordFields = form.querySelectorAll('input[type="password"]');
-  passwordFields.forEach(field => {
-    if (field.dataset.strength) {
-      field.addEventListener('input', function() {
-        const strength = checkPasswordStrength(this.value);
-        const meter = document.getElementById(this.id + '_strength');
-        if (meter) meter.value = strength;
-      });
-    }
-  });
-
   form.addEventListener('submit', function(e) {
-    e.preventDefault();
     let valid = true;
     const errors = [];
-
-    const passwordFields = form.querySelectorAll('input[type="password"]');
-    passwordFields.forEach(field => {
-      if (field.dataset.strength) {
-        const strength = checkPasswordStrength(field.value);
-        if (strength < parseInt(field.dataset.strength)) {
-          errors.push(`Password strength must be at least ${field.dataset.strength}`);
-          valid = false;
-        }
-      }
-      if (field.dataset.confirm) {
-        const confirmField = document.getElementById(field.dataset.confirm);
-        if (confirmField && field.value !== confirmField.value) {
-          errors.push('Passwords do not match');
-          valid = false;
-        }
-      }
-    });
 
     {
       var address_zip = document.getElementById('address_zip');
       var address_zipVal = address_zip ? address_zip.value : '';
-      if (!address_zip || address_zipVal === '') {
-        errors.push("Field 'address_zip' is required.");
-        valid = false;
-      } else if (parseFloat(address_zipVal) < 10000) {
+      if (address_zip && address_zipVal !== '' && parseFloat(address_zipVal) < 10000) {
         errors.push("ZIP too short!");
         valid = false;
       }
@@ -97,19 +49,14 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       var address_street = document.getElementById('address_street');
       var address_streetVal = address_street ? address_street.value : '';
-      if (!address_street || address_streetVal === '') {
-        errors.push("Field 'address_street' is required.");
-        valid = false;
-      } else if (parseFloat(address_streetVal) == 0) {
+      if (address_street && address_streetVal !== '' && parseFloat(address_streetVal) == 0) {
         errors.push("Street required!");
         valid = false;
       }
     }
     if (!valid) {
-      errorDiv.innerHTML = errors.join('<br>');
-    } else {
-      errorDiv.innerHTML = '';
-      form.submit();
+      e.preventDefault();
+      alert(errors.join('\n'));
     }
   });
 });

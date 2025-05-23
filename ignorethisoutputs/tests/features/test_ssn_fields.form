@@ -1,0 +1,25 @@
+form SSNFieldTest {
+    section SSNTests {
+        field basic_ssn: ssn required;
+        
+        field primary_ssn: ssn {
+            required;
+            default = "123-45-6789";
+        }
+        
+        field spouse_ssn: ssn {
+            optional;
+            default = "987-65-4321";
+        }
+    }
+
+    validate {
+        if basic_ssn == 0 { error "SSN is required."; }
+        if !basic_ssn.matches("^[0-9]{3}-[0-9]{2}-[0-9]{4}$") { error "Invalid SSN format."; }
+        
+        if primary_ssn == 0 { error "Primary SSN is required."; }
+        if !primary_ssn.matches("^[0-9]{3}-[0-9]{2}-[0-9]{4}$") { error "Invalid primary SSN format."; }
+        
+        if spouse_ssn != 0 && !spouse_ssn.matches("^[0-9]{3}-[0-9]{2}-[0-9]{4}$") { error "Invalid spouse SSN format."; }
+    }
+} 

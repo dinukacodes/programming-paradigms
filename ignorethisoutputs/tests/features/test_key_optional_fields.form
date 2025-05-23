@@ -1,0 +1,29 @@
+form KeyOptionalFieldTest {
+    section KeyOptionalTests {
+        field basic_keyoptional: key_optional required;
+        
+        field field_key: key_optional {
+            required;
+            default = true;
+        }
+        
+        field section_key: key_optional {
+            optional;
+            default = false;
+        }
+        
+        field group_key: key_optional {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_keyoptional == 0 { error "Key/Optional selection is required."; }
+        
+        if field_key == 0 { error "Field key status is required."; }
+        if !field_key { error "Field must be key."; }
+        
+        if group_key == 0 { error "Group key status is required."; }
+    }
+} 

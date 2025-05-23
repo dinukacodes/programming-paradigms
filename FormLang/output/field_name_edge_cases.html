@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FieldNameEdgeCases</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="FieldNameEdgeCases" onsubmit="return validateForm()">
+<section>
+<h2>SpecialCharacters</h2>
+<label for="field_with_dots">field_with_dots *</label>
+<input type="text" id="field_with_dots" name="field_with_dots" required maxlength="25901">
+<label for="field_with_at_symbol">field_with_at_symbol *</label>
+<input type="text" id="field_with_at_symbol" name="field_with_at_symbol" required maxlength="25901">
+<label for="field_with_dollar">field_with_dollar *</label>
+<input type="text" id="field_with_dollar" name="field_with_dollar" required maxlength="25901">
+<label for="field_with_hash">field_with_hash *</label>
+<input type="text" id="field_with_hash" name="field_with_hash" required maxlength="25901">
+<label for="field_with_percent">field_with_percent *</label>
+<input type="text" id="field_with_percent" name="field_with_percent" required maxlength="25901">
+<label for="field_with_ampersand">field_with_ampersand *</label>
+<input type="text" id="field_with_ampersand" name="field_with_ampersand" required maxlength="25901">
+<label for="field_with_star">field_with_star *</label>
+<input type="text" id="field_with_star" name="field_with_star" required maxlength="25901">
+<label for="field_with_plus">field_with_plus *</label>
+<input type="text" id="field_with_plus" name="field_with_plus" required maxlength="25901">
+<label for="field_with_hyphen">field_with_hyphen *</label>
+<input type="text" id="field_with_hyphen" name="field_with_hyphen" required maxlength="25901">
+<label for="field_with_equals">field_with_equals *</label>
+<input type="text" id="field_with_equals" name="field_with_equals" required maxlength="25901">
+</section>
+<section>
+<h2>UnicodeNames</h2>
+<label for="unicode_chinese">unicode_chinese *</label>
+<input type="text" id="unicode_chinese" name="unicode_chinese" required maxlength="25901" data-confirm="field_with_percent" data-strength="8">
+<label for="unicode_japanese">unicode_japanese *</label>
+<input type="text" id="unicode_japanese" name="unicode_japanese" required maxlength="25901">
+<label for="unicode_korean">unicode_korean *</label>
+<input type="text" id="unicode_korean" name="unicode_korean" required maxlength="25901">
+<label for="unicode_hindi">unicode_hindi *</label>
+<input type="text" id="unicode_hindi" name="unicode_hindi" required maxlength="25901">
+<label for="unicode_arabic">unicode_arabic *</label>
+<input type="text" id="unicode_arabic" name="unicode_arabic" required maxlength="25901">
+</section>
+<section>
+<h2>ReservedKeywords</h2>
+<label for="form_field">form_field *</label>
+<input type="text" id="form_field" name="form_field" required maxlength="25901" data-confirm="field_with_percent" data-strength="8">
+<label for="section_field">section_field *</label>
+<input type="text" id="section_field" name="section_field" required maxlength="25901">
+<label for="field_field">field_field *</label>
+<input type="text" id="field_field" name="field_field" required maxlength="25901">
+<label for="required_field">required_field *</label>
+<input type="text" id="required_field" name="required_field" required maxlength="25901">
+<label for="optional_field">optional_field *</label>
+<input type="text" id="optional_field" name="optional_field" required maxlength="25901">
+</section>
+<section>
+<h2>LengthEdgeCases</h2>
+<label for="a">a *</label>
+<input type="text" id="a" name="a" required maxlength="25901" data-confirm="field_with_percent" data-strength="8">
+<label for="very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly">very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly *</label>
+<input type="text" id="very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly" name="very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly" required maxlength="25901">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AttributeEdgeCases</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="AttributeEdgeCases" onsubmit="return validateForm()">
+<section>
+<h2>PatternEdgeCases</h2>
+<label for="empty_pattern">empty_pattern</label>
+<input type="text" id="empty_pattern" name="empty_pattern" maxlength="25561">
+<label for="complex_pattern">complex_pattern</label>
+<input type="text" id="complex_pattern" name="complex_pattern" maxlength="25561" pattern="^[A-Za-z0-9!@#$%^&amp;*()_+\-=\[\]{};':&quot;\\|,.&lt;&gt;\/? ]+$">
+<label for="email_pattern">email_pattern</label>
+<input type="text" id="email_pattern" name="email_pattern" maxlength="25561" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+<label for="url_pattern">url_pattern</label>
+<input type="text" id="url_pattern" name="url_pattern" maxlength="25561" pattern="^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$">
+</section>
+<section>
+<h2>LengthEdgeCases</h2>
+<label for="zero_length">zero_length</label>
+<input type="text" id="zero_length" name="zero_length" maxlength="25561">
+<label for="max_length">max_length</label>
+<input type="text" id="max_length" name="max_length" minlength="1" maxlength="25561">
+<label for="min_length">min_length</label>
+<input type="text" id="min_length" name="min_length" minlength="1" maxlength="25561">
+</section>
+<section>
+<h2>NumberEdgeCases</h2>
+<label for="zero_range">zero_range</label>
+<input type="number" id="zero_range" name="zero_range" maxlength="25561" min="0" max="0">
+<label for="large_range">large_range</label>
+<input type="number" id="large_range" name="large_range" maxlength="25561" min="0" max="0">
+<label for="decimal_range">decimal_range</label>
+<input type="number" id="decimal_range" name="decimal_range" maxlength="25561" min="0" max="0">
+</section>
+<section>
+<h2>DefaultValueEdgeCases</h2>
+<label for="empty_default">empty_default</label>
+<input type="text" id="empty_default" name="empty_default" maxlength="25561" value="">
+<label for="space_default">space_default</label>
+<input type="text" id="space_default" name="space_default" maxlength="25561" value=" ">
+<label for="special_chars_default">special_chars_default</label>
+<input type="text" id="special_chars_default" name="special_chars_default" maxlength="25561" value="!@#$%^&amp;*()">
+<label for="unicode_default">unicode_default</label>
+<input type="text" id="unicode_default" name="unicode_default" maxlength="25561" value="测试">
+</section>
+<section>
+<h2>MixedAttributes</h2>
+<label for="complex_field">complex_field</label>
+<input type="text" id="complex_field" name="complex_field" minlength="1" maxlength="25561">
+<label for="all_optional">all_optional</label>
+<input type="text" id="all_optional" name="all_optional" maxlength="25561">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

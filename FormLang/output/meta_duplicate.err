@@ -1,0 +1,13 @@
+Parser Error: syntax error, unexpected '{', expecting FIELD or '}' at line 7
+Parser Error: Invalid field declaration at line 8
+Starting HTML generation
+Generating header
+Processing 1 sections
+Generating section 0
+Starting section generation
+Processing 1 fields
+Generating field 0
+Field 0 generated successfully
+Section generation complete
+HTML generation complete
+Parser Error: syntax error, unexpected '}', expecting end of file at line 11

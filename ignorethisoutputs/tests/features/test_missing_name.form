@@ -1,0 +1,5 @@
+form MissingName {
+  section Test {
+    field : text required;
+  }
+}

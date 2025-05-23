@@ -1,0 +1,27 @@
+form PhoneFieldTest {
+    section PhoneTests {
+        field basic_phone: phone required;
+        
+        field home_phone: phone {
+            required;
+            default = "+1-555-123-4567";
+        }
+        
+        field work_phone: phone {
+            optional;
+            default = "+1-555-987-6543";
+        }
+        
+        field international_phone: phone {
+            required;
+            default = "+44-20-7123-4567";
+        }
+    }
+
+    validate {
+        if basic_phone == 0 { error "Phone number is required."; }
+        if home_phone == 0 { error "Home phone is required."; }
+        if work_phone != 0 && !work_phone.matches("^\\+[0-9-]+$") { error "Invalid work phone format."; }
+        if !international_phone.matches("^\\+[0-9-]+$") { error "Invalid international phone format."; }
+    }
+} 

@@ -1,0 +1,5 @@
+form MissingType {
+  section Test {
+    field test: required;
+  }
+}

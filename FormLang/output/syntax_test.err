@@ -1,0 +1,5 @@
+Parser Error: syntax error, unexpected NUMBER_LITERAL, expecting STRING_LITERAL at line 29
+Parser Error: Invalid field declaration at line 29
+Parser Error: syntax error, unexpected IDENTIFIER, expecting STRING_LITERAL at line 45
+Parser Error: Invalid field declaration at line 45
+Parser Error: syntax error, unexpected IDENTIFIER, expecting NUMBER_LITERAL at line 69

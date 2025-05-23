@@ -1,0 +1,6 @@
+Parser Error: Duplicate field name at line 18
+Parser Error: Invalid field declaration at line 18
+Parser Error: Duplicate field name at line 22
+Parser Error: Invalid field declaration at line 22
+Syntax error at line 35: Unexpected character
+Parser Error: syntax error, unexpected end of file, expecting ':' at line 35

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SingleSection</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<form id="SingleSection" onsubmit="return validateForm()">
+<section>
+<h2>UserDetails</h2>
+<label for="name">name *</label>
+<input type="text" id="name" name="name" required minlength="128931296" maxlength="24394">
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required minlength="128931520" maxlength="24394">
+<label for="password">password *</label>
+<input type="password" id="password" name="password" required minlength="128931824" maxlength="24394">
+<label for="age">age</label>
+<input type="number" id="age" name="age" minlength="128932256" maxlength="24394" min="0" max="0">
+</section>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const errors = [];
+
+    if (!valid) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+});
+</script>

@@ -1,0 +1,72 @@
+form SyntaxTest {
+    meta author = "SE2062 Team";
+    meta version = "1.0";
+    meta description = "Comprehensive test of all FormLang++ features";
+
+    section TextFields {
+        field basic_text: text required;
+        field length_text: text minLength 50;
+        field pattern_text: text pattern "^[A-Za-z0-9]+$";
+        field default_text: text default "John Doe";
+    }
+
+    section EmailFields {
+        field basic_email: email required;
+        field custom_email: email pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        field work_email: email default "user@company.com";
+    }
+
+    section PasswordFields {
+        field basic_password: password required;
+        field strong_password: password minLength 8;
+        field confirm_password: password required;
+    }
+
+    section NumberFields {
+        field basic_number: number required;
+        field range_number: number min 0;
+        field decimal_number: number max 999;
+        field default_number: number default 1;
+    }
+
+    section TextareaFields {
+        field basic_textarea: textarea required;
+        field dimension_textarea: textarea rows 5;
+        field length_textarea: textarea minLength 10;
+    }
+
+    section DateFields {
+        field basic_date: date required;
+        field default_date: date default "2024-12-31";
+    }
+
+    section SelectionFields {
+        field basic_checkbox: checkbox required;
+        field default_checkbox: checkbox default true;
+        field basic_dropdown: dropdown required;
+        field default_dropdown: dropdown default "en";
+        field optional_dropdown: dropdown optional;
+        field basic_radio: radio required;
+        field default_radio: radio default "option1";
+        field optional_radio: radio optional;
+    }
+
+    section FileFields {
+        field basic_file: file required;
+        field image_file: file pattern "image/*";
+        field doc_file: file pattern "*.pdf";
+        field optional_file: file pattern "*/*";
+    }
+
+    section AddressFields {
+        field street: text required;
+        field city: text required;
+        field postal_code: text pattern "^[A-Z]{2}\\d{2}\\s?\\d{2}[A-Z]{2}$";
+    }
+
+    validate {
+        if age < 18 { error "You must be at least 18 years old."; }
+        if password != confirm_password { error "Passwords do not match."; }
+        if length(bio) > 0 && length(bio) < 10 { error "Bio must be at least 10 characters if provided."; }
+    }
+} 

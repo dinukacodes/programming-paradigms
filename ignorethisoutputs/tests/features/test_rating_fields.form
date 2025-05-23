@@ -1,0 +1,33 @@
+form RatingFieldTest {
+    section RatingTests {
+        field basic_rating: rating required;
+        
+        field product_rating: rating {
+            required;
+            default = 4;
+        }
+        
+        field service_rating: rating {
+            optional;
+            default = 5;
+        }
+        
+        field overall_rating: rating {
+            required;
+            default = 3;
+        }
+    }
+
+    validate {
+        if basic_rating == 0 { error "Rating is required."; }
+        if basic_rating < 1 || basic_rating > 5 { error "Rating must be between 1 and 5."; }
+        
+        if product_rating == 0 { error "Product rating is required."; }
+        if product_rating < 1 || product_rating > 5 { error "Product rating must be between 1 and 5."; }
+        
+        if service_rating != 0 && (service_rating < 1 || service_rating > 5) { error "Service rating must be between 1 and 5."; }
+        
+        if overall_rating == 0 { error "Overall rating is required."; }
+        if overall_rating < 1 || overall_rating > 5 { error "Overall rating must be between 1 and 5."; }
+    }
+} 

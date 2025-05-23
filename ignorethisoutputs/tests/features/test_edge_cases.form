@@ -1,0 +1,60 @@
+form EdgeCaseTest {
+    section EmptySection {
+    }
+
+    section LongFieldNames {
+        field very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly: text required;
+    }
+
+    section SpecialCharacters {
+        field field_with_dots: text required;
+        field field-with-dashes: text required;
+        field field_with_underscores: text required;
+        field fieldWithCamelCase: text required;
+    }
+
+    section UnicodeNames {
+        field unicode_chinese: text required;
+        field unicode_japanese: text required;
+        field unicode_korean: text required;
+        field unicode_hindi: text required;
+        field unicode_arabic: text required;
+    }
+
+    section ReservedKeywords {
+        field form_field: text required;
+        field section_field: text required;
+        field field_field: text required;
+        field required_field: text required;
+        field optional_field: text required;
+    }
+
+    section LengthEdgeCases {
+        field a: text required;
+        field very_long_field_name_that_exceeds_normal_length_but_should_still_work_properly: text required;
+    }
+
+    section PatternEdgeCases {
+        field empty_pattern: text pattern "" required;
+        field complex_pattern: text pattern "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$" required;
+        field escaped_pattern: text pattern "\\d{3}-\\d{3}-\\d{4}" required;
+    }
+
+    section DefaultValueEdgeCases {
+        field empty_default: text default "" required;
+        field special_chars_default: text default "!@#$%^&*()" required;
+        field unicode_default: text default "你好世界" required;
+    }
+
+    section NumberEdgeCases {
+        field zero_min: number min 0 max 100 required;
+        field negative_range: number min -100 max 100 required;
+        field large_numbers: number min 1000000 max 9999999 required;
+    }
+
+    section DateEdgeCases {
+        field past_date: date default "1900-01-01" required;
+        field future_date: date default "2100-12-31" required;
+        field current_date: date default "2024-03-20" required;
+    }
+} 

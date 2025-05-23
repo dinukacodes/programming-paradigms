@@ -1,0 +1,29 @@
+form NecessaryOptionalFieldTest {
+    section NecessaryOptionalTests {
+        field basic_necessaryoptional: necessary_optional required;
+        
+        field field_necessary: necessary_optional {
+            required;
+            default = true;
+        }
+        
+        field section_necessary: necessary_optional {
+            optional;
+            default = false;
+        }
+        
+        field group_necessary: necessary_optional {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_necessaryoptional == 0 { error "Necessary/Optional selection is required."; }
+        
+        if field_necessary == 0 { error "Field necessary status is required."; }
+        if !field_necessary { error "Field must be necessary."; }
+        
+        if group_necessary == 0 { error "Group necessary status is required."; }
+    }
+} 

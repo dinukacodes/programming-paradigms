@@ -1,12 +1,12 @@
 form Milestone5Simple {
     section UserInfo {
-        field username: username required minLength 4 maxLength 16;
-        field password: password required strength 3;
-        field confirmPassword: password required confirm password;
+        field username: text required minLength 4 maxLength 16;
+        field password: password required;
+        field confirmPassword: password required;
     }
 
     section AddressInfo {
-        field homeAddress: address required;
+        field homeAddress: text required;
     }
 
     validate {

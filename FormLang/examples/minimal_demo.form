@@ -1,0 +1,9 @@
+form MinimalDemo {
+    meta author = "SE2062 Team";
+
+    section Info {
+        field name: text {
+            required;
+        }
+    }
+} 

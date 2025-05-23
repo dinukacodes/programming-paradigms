@@ -1,0 +1,19 @@
+form SimpleDemo {
+    meta author = "SE2062 Team";
+    meta version = "1.0";
+
+    section PersonalInfo {
+        field name: text required minLength 2 maxLength 50;
+        field email: email required;
+        field age: number required min 0 max 120;
+    }
+
+    section AccountInfo {
+        field username: text required minLength 4 maxLength 20;
+        field password: password required minLength 8;
+    }
+
+    validate {
+        if age < 18 { error "You must be at least 18 years old."; }
+    }
+} 

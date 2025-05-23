@@ -1,0 +1,5 @@
+form InvalidAttribute {
+  section Test {
+    field test: text invalid;
+  }
+}

@@ -1,0 +1,48 @@
+form AddressFieldTest {
+    section AddressTests {
+        field basic_address: address required;
+        
+        field home_address: address {
+            required;
+            default = {
+                street = "123 Main St";
+                city = "Anytown";
+                state = "CA";
+                zip = "12345";
+                country = "USA";
+            }
+        }
+        
+        field work_address: address {
+            optional;
+            default = {
+                street = "456 Work Ave";
+                city = "Worktown";
+                state = "NY";
+                zip = "67890";
+                country = "USA";
+            }
+        }
+        
+        field international_address: address {
+            required;
+            default = {
+                street = "789 Global Rd";
+                city = "World City";
+                state = "";
+                zip = "ABCDE";
+                country = "UK";
+            }
+        }
+    }
+
+    validate {
+        if basic_address_street == 0 { error "Street address is required."; }
+        if basic_address_city == 0 { error "City is required."; }
+        if basic_address_zip == 0 { error "ZIP code is required."; }
+        if basic_address_country == 0 { error "Country is required."; }
+        
+        if home_address_street == 0 { error "Home street address is required."; }
+        if work_address_street != 0 && work_address_city == 0 { error "Work city is required if street is provided."; }
+    }
+} 

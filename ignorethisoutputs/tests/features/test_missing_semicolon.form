@@ -1,0 +1,5 @@
+form MissingSemicolon {
+  section Test {
+    field test: text required
+  }
+}

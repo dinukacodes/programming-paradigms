@@ -1,0 +1,116 @@
+Parser Error: syntax error, unexpected IDENTIFIER, expecting FIELD or '}' at line 46
+Parser Error: Invalid field declaration at line 46
+Syntax error at line 51: Unexpected character
+Parser Error: syntax error, unexpected invalid token, expecting NUMBER_LITERAL at line 51
+Syntax error at line 51: Unexpected character
+Parser Error: Invalid field declaration at line 51
+Syntax error at line 53: Unexpected character
+Parser Error: syntax error, unexpected invalid token, expecting FIELD or '}' at line 53
+Syntax error at line 53: Unexpected character
+Parser Error: Invalid field declaration at line 53
+Starting HTML generation
+Generating header
+Processing 9 sections
+Generating section 0
+Starting section generation
+Processing 6 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Generating field 4
+Field 4 generated successfully
+Generating field 5
+Field 5 generated successfully
+Section generation complete
+Generating section 1
+Starting section generation
+Processing 4 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Section generation complete
+Generating section 2
+Starting section generation
+Processing 4 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Section generation complete
+Generating section 3
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 4
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 5
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 6
+Starting section generation
+Processing 3 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Section generation complete
+Generating section 7
+Starting section generation
+Processing 5 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Generating field 2
+Field 2 generated successfully
+Generating field 3
+Field 3 generated successfully
+Generating field 4
+Field 4 generated successfully
+Section generation complete
+Generating section 8
+Starting section generation
+Processing 2 fields
+Generating field 0
+Field 0 generated successfully
+Generating field 1
+Field 1 generated successfully
+Section generation complete
+HTML generation complete

@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-form { background: #f5f5f5; padding: 20px; border-radius: 5px; }
-section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 5px; }
-h2 { color: #333; margin-top: 0; }
-label { display: block; margin-bottom: 5px; }
-input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
-input[type=submit] { background: #4CAF50; color: white; border: none; padding: 10px 20px; cursor: pointer; width: auto; }
-input[type=submit]:hover { background: #45a049; }
-.radio-group { margin-bottom: 10px; }
-.radio-group label { display: inline; margin-left: 5px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ValidationTest</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    legend { font-weight: bold; padding: 0 10px; }
+    .field { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-bottom: 5px; }
+    .error { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
 </head>
 <body>
-<form>
+<form id="ValidationTest" onsubmit="return validateForm()">
 <section>
 <h2>UserInfo</h2>
-<label for="username">username</label>
-<input type="text" id="username" name="username" minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
+<label for="username">username *</label>
+<input type="text" id="username" name="username" required maxlength="25289">
 <label for="email">email *</label>
-<input type="email" id="email" name="email" required>
-<label for="password">password</label>
-<input type="password" id="password" name="password">
-<label for="confirmPassword">confirmPassword</label>
-<input type="password" id="confirmPassword" name="confirmPassword">
-<label for="age">age</label>
-<input type="number" id="age" name="age" min="18" max="120">
-<label for="score">score</label>
-<input type="number" id="score" name="score" max="100">
+<input type="email" id="email" name="email" required maxlength="25289">
+<label for="password">password *</label>
+<input type="password" id="password" name="password" required maxlength="25289">
+<label for="confirmPassword">confirmPassword *</label>
+<input type="password" id="confirmPassword" name="confirmPassword" required maxlength="25289">
+<label for="age">age *</label>
+<input type="number" id="age" name="age" required maxlength="25289" min="0" max="0">
+<label for="score">score *</label>
+<input type="number" id="score" name="score" required maxlength="25289" min="0" max="0">
 </section>
 <section>
 <h2>PatternTests</h2>
-<label for="empty_pattern">empty_pattern *</label>
-<input type="text" id="empty_pattern" name="empty_pattern" required pattern=".*" data-confirm="age" data-strength="7">
-<label for="complex_pattern">complex_pattern *</label>
-<input type="text" id="complex_pattern" name="complex_pattern" required pattern="^[A-Za-z0-9!@#$%^&amp;*()_+-=[]{};':&quot;\|,.&lt;&gt;/? ]+$">
-<label for="email_pattern">email_pattern *</label>
-<input type="text" id="email_pattern" name="email_pattern" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$">
-<label for="url_pattern">url_pattern *</label>
-<input type="text" id="url_pattern" name="url_pattern" required pattern="^(https?://)?([da-z.-]+).([a-z.]{2,6})([/w .-]*)*/?$">
+<label for="empty_pattern">empty_pattern</label>
+<input type="text" id="empty_pattern" name="empty_pattern" maxlength="25289" pattern=".*" data-confirm="age" data-strength="8">
+<label for="complex_pattern">complex_pattern</label>
+<input type="text" id="complex_pattern" name="complex_pattern" maxlength="25289" pattern="^[A-Za-z0-9!@#$%^&amp;*()_+-=[]{};':&quot;\|,.&lt;&gt;/? ]+$">
+<label for="email_pattern">email_pattern</label>
+<input type="text" id="email_pattern" name="email_pattern" maxlength="25289" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$">
+<label for="url_pattern">url_pattern</label>
+<input type="text" id="url_pattern" name="url_pattern" maxlength="25289" pattern="^(https?://)?([da-z.-]+).([a-z.]{2,6})([/w .-]*)*/?$">
 </section>
 <section>
 <h2>RequiredTests</h2>
 <label for="required_no_validation">required_no_validation *</label>
-<input type="text" id="required_no_validation" name="required_no_validation" required data-confirm="age" data-strength="7">
-<label for="required_with_pattern">required_with_pattern *</label>
-<input type="text" id="required_with_pattern" name="required_with_pattern" required pattern=".*">
-<label for="required_with_length">required_with_length *</label>
-<input type="text" id="required_with_length" name="required_with_length" required minlength="1" maxlength="10">
-<label for="required_with_default">required_with_default *</label>
-<input type="text" id="required_with_default" name="required_with_default" required value="test">
+<input type="text" id="required_no_validation" name="required_no_validation" required maxlength="25289" data-confirm="age" data-strength="8">
+<label for="required_with_pattern">required_with_pattern</label>
+<input type="text" id="required_with_pattern" name="required_with_pattern" maxlength="25289" pattern=".*">
+<label for="required_with_length">required_with_length</label>
+<input type="text" id="required_with_length" name="required_with_length" minlength="1" maxlength="25289">
+<label for="required_with_default">required_with_default</label>
+<input type="text" id="required_with_default" name="required_with_default" maxlength="25289" value="test">
 </section>
 <section>
 <h2>DropdownTests</h2>
@@ -66,9 +66,10 @@ input[type=submit]:hover { background: #45a049; }
   <option value="option1">Option 1</option>
   <option value="option2">Option 2</option>
 </select>
-<label for="dropdown_with_default">dropdown_with_default *</label>
-<select id="dropdown_with_default" name="dropdown_with_default" required>
-  <option value="option1">Option 1</option>
+<label for="dropdown_with_default">dropdown_with_default</label>
+<select id="dropdown_with_default" name="dropdown_with_default">
+  <option value="">Select an option</option>
+  <option value="option1" selected>Option 1</option>
   <option value="option2">Option 2</option>
 </select>
 </section>
@@ -88,47 +89,51 @@ input[type=submit]:hover { background: #45a049; }
   <input type="radio" id="optional_radio_2" name="optional_radio" value="option2">
   <span>Option 2</span>
 </div>
-<label for="radio_with_default">radio_with_default *</label>
+<label for="radio_with_default">radio_with_default</label>
 <div class="radio-group">
-  <input type="radio" id="radio_with_default_1" name="radio_with_default" value="option1" required>
+  <input type="radio" id="radio_with_default_1" name="radio_with_default" value="option1" checked>
   <span>Option 1</span><br>
-  <input type="radio" id="radio_with_default_2" name="radio_with_default" value="option2" required>
+  <input type="radio" id="radio_with_default_2" name="radio_with_default" value="option2">
   <span>Option 2</span>
 </div>
 </section>
 <section>
 <h2>FileTests</h2>
 <label for="required_file">required_file *</label>
-<input type="file" id="required_file" name="required_file" required accept="*/*" data-confirm="age" data-strength="7">
+<input type="file" id="required_file" name="required_file" required maxlength="25289" accept="*/*" data-confirm="age" data-strength="8">
 <label for="optional_file">optional_file</label>
-<input type="file" id="optional_file" name="optional_file" accept="*/*">
+<input type="file" id="optional_file" name="optional_file" maxlength="25289" accept="*/*">
+<label for="file_with_accept">file_with_accept</label>
+<input type="file" id="file_with_accept" name="file_with_accept" maxlength="25289" accept="*/*">
 </section>
 <section>
 <h2>NumberTests</h2>
 <label for="zero_range">zero_range *</label>
-<input type="number" id="zero_range" name="zero_range" required min="-1" max="-1" data-confirm="age" data-strength="7">
-<label for="positive_range">positive_range *</label>
-<input type="number" id="positive_range" name="positive_range" required min="1" max="10">
+<input type="number" id="zero_range" name="zero_range" required maxlength="25289" min="0" max="0" data-confirm="age" data-strength="8">
+<label for="positive_range">positive_range</label>
+<input type="number" id="positive_range" name="positive_range" maxlength="25289" min="1" max="0">
+<label for="decimal_range">decimal_range</label>
+<input type="number" id="decimal_range" name="decimal_range" maxlength="25289" min="0" max="0">
 </section>
 <section>
 <h2>DefaultValueTests</h2>
-<label for="empty_default">empty_default *</label>
-<input type="text" id="empty_default" name="empty_default" required value="" data-confirm="age" data-strength="7">
-<label for="space_default">space_default *</label>
-<input type="text" id="space_default" name="space_default" required value=" ">
-<label for="special_chars">special_chars *</label>
-<input type="text" id="special_chars" name="special_chars" required value="!@#$%^&amp;*()">
-<label for="unicode_default">unicode_default *</label>
-<input type="text" id="unicode_default" name="unicode_default" required value="测试">
-<label for="zero_default">zero_default *</label>
-<input type="number" id="zero_default" name="zero_default" required min="-1" max="-1" value="0">
+<label for="empty_default">empty_default</label>
+<input type="text" id="empty_default" name="empty_default" maxlength="25289" value="" data-confirm="age" data-strength="8">
+<label for="space_default">space_default</label>
+<input type="text" id="space_default" name="space_default" maxlength="25289" value=" ">
+<label for="special_chars">special_chars</label>
+<input type="text" id="special_chars" name="special_chars" maxlength="25289" value="!@#$%^&amp;*()">
+<label for="unicode_default">unicode_default</label>
+<input type="text" id="unicode_default" name="unicode_default" maxlength="25289" value="测试">
+<label for="zero_default">zero_default</label>
+<input type="number" id="zero_default" name="zero_default" maxlength="25289" min="0" max="0" value="0">
 </section>
 <section>
 <h2>MixedAttributes</h2>
-<label for="complex_field">complex_field *</label>
-<input type="text" id="complex_field" name="complex_field" required minlength="1" maxlength="100" pattern="^[A-Za-z]+$" value="test" data-confirm="age" data-strength="7">
+<label for="complex_field">complex_field</label>
+<input type="text" id="complex_field" name="complex_field" maxlength="25289" pattern="^[A-Za-z]+$" data-confirm="age" data-strength="8">
 <label for="all_optional">all_optional</label>
-<input type="text" id="all_optional" name="all_optional" maxlength="1000" pattern=".*" value="">
+<input type="text" id="all_optional" name="all_optional" maxlength="25289" pattern=".*">
 </section>
 <input type="submit" value="Submit">
 </form>

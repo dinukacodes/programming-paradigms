@@ -1,0 +1,3 @@
+Parser Error: syntax error, unexpected '{', expecting FIELD or '}' at line 7
+Parser Error: Invalid field declaration at line 8
+Parser Error: syntax error, unexpected FIELD, expecting SECTION or META or VALIDATE or '}' at line 10

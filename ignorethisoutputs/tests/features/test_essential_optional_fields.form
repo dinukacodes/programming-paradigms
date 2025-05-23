@@ -1,0 +1,29 @@
+form EssentialOptionalFieldTest {
+    section EssentialOptionalTests {
+        field basic_essentialoptional: essential_optional required;
+        
+        field field_essential: essential_optional {
+            required;
+            default = true;
+        }
+        
+        field section_essential: essential_optional {
+            optional;
+            default = false;
+        }
+        
+        field group_essential: essential_optional {
+            required;
+            default = true;
+        }
+    }
+
+    validate {
+        if basic_essentialoptional == 0 { error "Essential/Optional selection is required."; }
+        
+        if field_essential == 0 { error "Field essential status is required."; }
+        if !field_essential { error "Field must be essential."; }
+        
+        if group_essential == 0 { error "Group essential status is required."; }
+    }
+} 

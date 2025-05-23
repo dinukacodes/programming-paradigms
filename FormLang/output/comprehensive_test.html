@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ComprehensiveTest</title>
+  <!-- category: Registration -->
+  <!-- created: 2024-03-20 -->
+  <!-- description: Comprehensive test form demonstrating all FormLang++ features -->
+  <!-- version: 2.0 -->
+  <!-- author: SE2062 Team -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
     fieldset { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
@@ -16,7 +21,54 @@
 </head>
 <body>
 <form id="ComprehensiveTest" onsubmit="return validateForm()">
-<form>
+<section>
+<h2>PersonalInfo</h2>
+<label for="fullName">fullName *</label>
+<input type="text" id="fullName" name="fullName" required minlength="967039040" maxlength="25261">
+<label for="email">email *</label>
+<input type="email" id="email" name="email" required minlength="967039296" maxlength="25261">
+<label for="phone">phone *</label>
+<input type="text" id="phone" name="phone" required minlength="967039664" maxlength="25261">
+<label for="age">age *</label>
+<input type="number" id="age" name="age" required minlength="967040128" maxlength="25261" min="0" max="0">
+<label for="birthDate">birthDate *</label>
+<input type="date" id="birthDate" name="birthDate" required minlength="967040672" maxlength="25261">
+</section>
+<section>
+<h2>AccountSecurity</h2>
+<label for="username">username *</label>
+<input type="text" id="username" name="username" required minlength="967041440" maxlength="25261" data-confirm="birthDate" data-strength="14">
+<label for="password">password *</label>
+<input type="password" id="password" name="password" required minlength="967041680" maxlength="25261">
+<label for="confirmPassword">confirmPassword *</label>
+<input type="password" id="confirmPassword" name="confirmPassword" required minlength="967042096" maxlength="25261">
+</section>
+<section>
+<h2>AddressInfo</h2>
+<label for="homeAddress">homeAddress *</label>
+<input type="text" id="homeAddress" name="homeAddress" required minlength="967042704" maxlength="25261" data-confirm="birthDate" data-strength="14">
+<label for="shippingAddress">shippingAddress</label>
+<input type="text" id="shippingAddress" name="shippingAddress" minlength="967042960" maxlength="25261">
+</section>
+<section>
+<h2>Preferences</h2>
+<label for="subscriptionType">subscriptionType *</label>
+<select id="subscriptionType" name="subscriptionType" required>
+  <option value="option1">Option 1</option>
+  <option value="option2">Option 2</option>
+</select>
+<label for="preferredContact">preferredContact *</label>
+<div class="radio-group">
+  <input type="radio" id="preferredContact_1" name="preferredContact" value="option1" required>
+  <span>Option 1</span><br>
+  <input type="radio" id="preferredContact_2" name="preferredContact" value="option2" required>
+  <span>Option 2</span>
+</div>
+<label for="profilePicture">profilePicture</label>
+<input type="file" id="profilePicture" name="profilePicture" minlength="967044432" maxlength="25261" accept="*/*">
+<label for="bio">bio</label>
+<textarea id="bio" name="bio"></textarea>
+</section>
 <input type="submit" value="Submit">
 </form>
 </body>
@@ -28,6 +80,22 @@ document.addEventListener('DOMContentLoaded', function() {
     let valid = true;
     const errors = [];
 
+    {
+      var password = document.getElementById('password');
+      var passwordVal = password ? password.value : '';
+      if (password && passwordVal !== '' && parseFloat(passwordVal) == username) {
+        errors.push("Password cannot be the same as username.");
+        valid = false;
+      }
+    }
+    {
+      var age = document.getElementById('age');
+      var ageVal = age ? age.value : '';
+      if (age && ageVal !== '' && parseFloat(ageVal) < 18) {
+        errors.push("You must be at least 18 years old to register.");
+        valid = false;
+      }
+    }
     if (!valid) {
       e.preventDefault();
       alert(errors.join('\n'));

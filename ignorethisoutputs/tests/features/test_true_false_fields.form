@@ -1,0 +1,29 @@
+form TrueFalseFieldTest {
+    section TrueFalseTests {
+        field basic_truefalse: true_false required;
+        
+        field is_active: true_false {
+            required;
+            default = true;
+        }
+        
+        field is_verified: true_false {
+            optional;
+            default = false;
+        }
+        
+        field is_approved: true_false {
+            required;
+            default = false;
+        }
+    }
+
+    validate {
+        if basic_truefalse == 0 { error "True/False selection is required."; }
+        
+        if is_active == 0 { error "Active status is required."; }
+        if !is_active { error "Account must be active."; }
+        
+        if is_approved == 0 { error "Approval status is required."; }
+    }
+} 
